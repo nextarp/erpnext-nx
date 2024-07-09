@@ -219,7 +219,7 @@ class AbnAmroAPI:
 			return response.json()
 		else:
 			return None
-		
+
 dir = os.path.dirname(__file__)
 certificate_path = os.path.join(dir, 'CertificateCommercial.crt')
 private_key_path = os.path.join(dir, 'PrivateKeyCommercial.key')
@@ -233,4 +233,3 @@ abn_amro_api = AbnAmroAPI('test_client',
 						  'PWL3VDT9Y3sXMz1WWjvJTxRBxZgQkSr9',
 						  'account:balance:read account:details:read account:transaction:read',
 						'https://auth-mtls-sandbox.abnamro.com/as/token.oauth2')
-
