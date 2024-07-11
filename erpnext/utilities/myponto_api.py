@@ -72,5 +72,4 @@ class MyPontoAPI:
 		else:
 			return None
 
-
 myponto_api = MyPontoAPI(base_url='https://api.myponto.com')
