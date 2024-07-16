@@ -17,7 +17,7 @@ frappe.listview_settings["Timesheet"] = {
 		$('span[title^="Project:"]').on('click', function () {
 			let projectName = $(this).find('a').text();
 			console.log("asdasdsad");
-			var projectUrl = 'projects/' + projectName;
+			var projectUrl = 'project/' + projectName;
 			window.location.href = projectUrl;
 		});
 	}
