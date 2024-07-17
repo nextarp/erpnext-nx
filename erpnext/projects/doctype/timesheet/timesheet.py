@@ -33,6 +33,7 @@ class Timesheet(Document):
 		self.calculate_percentage_billed()
 		self.set_dates()
 
+	def before_save(self):
 		# Check if the user is assigned to the project
 		if self.parent_project and not is_user_assigned_to_project(frappe.session.user, self.parent_project):
 			frappe.throw(_("You are not assigned to the project {0}.").format(self.parent_project))
