@@ -32,6 +32,10 @@ class Timesheet(Document):
 		self.calculate_percentage_billed()
 		self.set_dates()
 
+		# Check if the user is assigned to the project
+		if self.parent_project and not is_user_assigned_to_project(frappe.session.user, self.parent_project):
+			frappe.throw(_("You are not assigned to the project {0}.").format(self.parent_project))
+
 	def calculate_hours(self):
 		for row in self.time_logs:
 			if row.to_time and row.from_time:
@@ -511,3 +515,10 @@ def get_list_context(context=None):
 		"get_list": get_timesheets_list,
 		"row_template": "templates/includes/timesheet/timesheet_row.html",
 	}
+
+def get_project_users(project):
+	return frappe.get_all('Project User', filters={'parent': project}, fields=['user'])
+
+def is_user_assigned_to_project(user, project):
+	project_users = get_project_users(project)
+	return any(pu['user'] == user for pu in project_users)
