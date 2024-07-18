@@ -38,6 +38,22 @@ class Timesheet(Document):
 		if self.parent_project and not is_user_assigned_to_project(frappe.session.user, self.parent_project):
 			frappe.throw(_("You are not assigned to the project {0}.").format(self.parent_project))
 
+		# get the user is project leader or not
+		is_project_leader = user_is_project_leader(frappe.session.user, self.parent_project)
+		today_date = getdate(nowdate()).strftime('%Y-%m-%d')
+		if not is_project_leader:
+			for log in self.time_logs:
+				from_time_date = getdate(log.from_time).strftime('%Y-%m-%d')
+				if from_time_date != today_date:
+					frappe.throw(_("Row {0}: You can only log timesheet for today.").format(log.idx))
+
+		else:
+			for log in self.time_logs:
+				from_time_date = getdate(log.from_time).strftime('%Y-%m-%d')
+				if from_time_date > today_date:
+					frappe.throw(_("Row {0}: You can only log timesheet for today or before.").format(log.idx))
+
+
 		# Check if the total working hours for today exceed 12 hours
 		total_hours_today = get_user_total_working_hours_for_today(frappe.session.user)
 		if total_hours_today + self.total_hours > 12:
@@ -476,11 +492,15 @@ def get_events(start, end, filters=None):
 @frappe.whitelist()
 def is_project_leader(project):
 	current_user = frappe.session.user
+	return user_is_project_leader(current_user, project)
+
+
+def user_is_project_leader(user, project):
 	# Check if the user is a project leader for the specified project
 	project_leaders = frappe.get_all(
 		"Project User",
 		filters={
-			"user": current_user,
+			"user": user,
 			"parent": project,
 			"custom_assign_role": ["in", ["Projectleider", "Uitvoerder"]]
 		}

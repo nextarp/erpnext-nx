@@ -443,20 +443,20 @@ function set_project_in_timelog(frm) {
 }
 
 function check_and_update_date_field(frm, cdt, cdn) {
-	// before sending the request to the server, check if the project has been chosen or not
-	if (!frm.doc.parent_project) {
-		frappe.msgprint(__("Please select a project first"));
-		return;
-	}
-
-
 	let child = locals[cdt][cdn];
 	let from_time_date = moment(child.from_time).format('YYYY-MM-DD');
 	let today_date = moment().format('YYYY-MM-DD');
 
+	// before sending the request to the server, check if the project has been chosen or not
+	if (!frm.doc.parent_project) {
+		frappe.model.set_value(cdt, cdn, 'from_time', today_date);
+		frappe.msgprint(__("Please select a project first"));
+		return;
+	}
+
 	// in order not to allow the user to select a future date
-	if(from_time_date>today_date){
-		frappe.msgprint(__("The date must be today\'s date or a past date."));
+	if (from_time_date > today_date) {
+		frappe.msgprint(__("You cannot select a future date"));
 		frappe.model.set_value(cdt, cdn, 'from_time', today_date);
 		return;
 	}
