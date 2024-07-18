@@ -8,6 +8,7 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 from frappe.utils import add_to_date, flt, get_datetime, getdate, time_diff_in_hours
+from frappe.utils import nowdate
 
 from erpnext.controllers.queries import get_match_cond
 from erpnext.setup.utils import get_exchange_rate
@@ -31,6 +32,16 @@ class Timesheet(Document):
 		self.calculate_total_amounts()
 		self.calculate_percentage_billed()
 		self.set_dates()
+
+	def before_save(self):
+		# Check if the user is assigned to the project
+		if self.parent_project and not is_user_assigned_to_project(frappe.session.user, self.parent_project):
+			frappe.throw(_("You are not assigned to the project {0}.").format(self.parent_project))
+
+		# Check if the total working hours for today exceed 12 hours
+		total_hours_today = get_user_total_working_hours_for_today(frappe.session.user)
+		if total_hours_today + self.total_hours > 12:
+			frappe.throw(_("You cannot log more than 12 hours in a single day."))
 
 	def calculate_hours(self):
 		for row in self.time_logs:
@@ -511,3 +522,22 @@ def get_list_context(context=None):
 		"get_list": get_timesheets_list,
 		"row_template": "templates/includes/timesheet/timesheet_row.html",
 	}
+
+def get_project_users(project):
+	return frappe.get_all('Project User', filters={'parent': project}, fields=['user'])
+
+def is_user_assigned_to_project(user, project):
+	project_users = get_project_users(project)
+	return any(pu['user'] == user for pu in project_users)
+
+def get_user_total_working_hours_for_today(user):
+	timesheet_details = frappe.get_all(
+		'Timesheet Detail',
+		filters={
+			'owner': user,
+			'from_time': ['>=', nowdate()]
+		},
+		fields=['hours']
+	)
+	total_hours = sum(detail['hours'] for detail in timesheet_details)
+	return total_hours
