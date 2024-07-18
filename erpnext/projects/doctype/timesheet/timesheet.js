@@ -277,7 +277,7 @@ frappe.ui.form.on("Timesheet Detail", {
 	},
 
 	from_time: function (frm, cdt, cdn) {
-		calculate_end_time(frm, cdt, cdn);
+		check_and_update_date_field(frm, cdt, cdn);
 	},
 
 	to_time: function (frm, cdt, cdn) {
@@ -440,4 +440,46 @@ function set_project_in_timelog(frm) {
 			frappe.model.set_value(item.doctype, item.name, "project", frm.doc.parent_project);
 		});
 	}
+}
+
+function check_and_update_date_field(frm, cdt, cdn) {
+	// before sending the request to the server, check if the project has been chosen or not
+	if (!frm.doc.parent_project) {
+		frappe.msgprint(__("Please select a project first"));
+		return;
+	}
+
+
+	let child = locals[cdt][cdn];
+	let from_time_date = moment(child.from_time).format('YYYY-MM-DD');
+	let today_date = moment().format('YYYY-MM-DD');
+
+	// in order not to allow the user to select a future date
+	if(from_time_date>today_date){
+		frappe.msgprint(__("The date must be today\'s date or a past date."));
+		frappe.model.set_value(cdt, cdn, 'from_time', today_date);
+		return;
+	}
+
+	// Check if the user is a project leader for the selected project
+	frappe.call({
+		method: "erpnext.projects.doctype.timesheet.timesheet.is_project_leader",
+		args: {
+			project: frm.doc.parent_project
+		},
+		callback: function (r) {
+			if (r.message === true) {
+				// If the user is a project leader, then allow the user to select just today's date and past dates
+				calculate_end_time(frm, cdt, cdn);
+
+			} else {
+				if (from_time_date === today_date) {
+					calculate_end_time(frm, cdt, cdn);
+				} else {
+					frappe.msgprint(__('The date must be today\'s date.'));
+					frappe.model.set_value(cdt, cdn, 'from_time', today_date);
+				}
+			}
+		}
+	});
 }

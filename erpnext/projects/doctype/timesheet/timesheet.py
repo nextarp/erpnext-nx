@@ -473,6 +473,21 @@ def get_events(start, end, filters=None):
 	)
 
 
+@frappe.whitelist()
+def is_project_leader(project):
+	current_user = frappe.session.user
+	# Check if the user is a project leader for the specified project
+	project_leaders = frappe.get_all(
+		"Project User",
+		filters={
+			"user": current_user,
+			"parent": project,
+			"custom_assign_role": ["in", ["Projectleider", "Uitvoerder"]]
+		}
+	)
+	return len(project_leaders) > 0
+
+
 def get_timesheets_list(doctype, txt, filters, limit_start, limit_page_length=20, order_by="modified"):
 	user = frappe.session.user
 	# find customer name from contact.
