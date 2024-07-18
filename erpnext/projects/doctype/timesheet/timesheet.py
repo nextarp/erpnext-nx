@@ -55,9 +55,14 @@ class Timesheet(Document):
 
 
 		# Check if the total working hours for today exceed 12 hours
-		total_hours_today = get_user_total_working_hours_for_today(frappe.session.user)
-		if total_hours_today + self.total_hours > 12:
-			frappe.throw(_("You cannot log more than 12 hours in a single day."))
+		# from the employee name get the employee mail
+		employee_name = self.employee_name
+		if employee_name:
+			employee_email = frappe.db.get_value("Employee",
+				{"employee_name": employee_name}, "user_id")
+			total_hours_today = get_user_total_working_hours_for_today(employee_email)
+			if total_hours_today + self.total_hours > 12:
+				frappe.throw(_("You cannot log more than 12 hours in a single day."))
 
 	def calculate_hours(self):
 		for row in self.time_logs:
