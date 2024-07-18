@@ -200,6 +200,13 @@ frappe.ui.form.on("Project", {
 	},
 });
 
+frappe.ui.form.on("Project Attachments", {
+	custom_project_files_add: function (frm, cdt, cdn) {
+		frappe.model.set_value(cdt, cdn, "uploaded_by", frappe.session.user);
+		frappe.model.set_value(cdt, cdn, "uploaded_at", frappe.datetime.now_datetime());
+	}
+});
+
 function open_form(frm, doctype, child_doctype, parentfield) {
 	frappe.model.with_doctype(doctype, () => {
 		let new_doc = frappe.model.get_new_doc(doctype);
