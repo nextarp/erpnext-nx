@@ -15,6 +15,7 @@ class ProjectAttachments(Document):
 		from frappe.types import DF
 
 		document_type: DF.Literal["Aanvraag", "Schouw", "Tekeningen", "Materiaal offerte", "Inkoop facturen", "Calculatie intern", "Offerte opdracht", "Planning", "KLIC", "Monteurs", "Netbeheerder werkzaamheden", "Meer & minder werk", "Revisie", "Oplevering", "Productiestaten / werkbonnen", "Email", "Oude documenten", "Verkoop facturen", "Uitvoering week"]
+		file: DF.Attach
 		parent: DF.Data
 		parentfield: DF.Data
 		parenttype: DF.Data
