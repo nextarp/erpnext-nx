@@ -45,6 +45,7 @@ from erpnext.controllers.accounts_controller import (
 	validate_taxes_and_charges,
 )
 from erpnext.setup.utils import get_exchange_rate
+from erpnext.utilities.abn_amro_api import abn_amro_api
 
 
 class InvalidPaymentEntry(ValidationError):
@@ -107,6 +108,12 @@ class PaymentEntry(AccountsController):
 		self.update_advance_paid()
 		self.update_payment_schedule()
 		self.set_status()
+
+	def before_save(self):
+		# initiate the payment
+		if self.payment_type == "Pay":
+			request_id = initiate_payment()
+			self.custom_requestid = request_id
 
 	def set_liability_account(self):
 		# Auto setting liability account should only be done during 'draft' status
@@ -2667,6 +2674,12 @@ def get_reference_as_per_payment_terms(
 			)
 
 	return references
+
+def initiate_payment():
+	x_request_id = abn_amro_api.generate_x_request_id()
+	access_token = abn_amro_api.get_access_payment_token()
+	payment_result = abn_amro_api.initiate_payment(access_token, x_request_id)
+	return x_request_id
 
 
 def get_paid_amount(dt, dn, party_type, party, account, due_date):

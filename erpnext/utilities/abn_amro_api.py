@@ -1,5 +1,6 @@
 import requests
 import os
+import uuid
 
 class AbnAmroAPI:
 	def __init__(self, client_id, cert_path, key_path, api_key, scope, payment_scope, api_url, base64_sct_file_data):
@@ -247,6 +248,9 @@ class AbnAmroAPI:
 			return response.json()
 		else:
 			return None
+
+	def generate_x_request_id(self):
+		return str(uuid.uuid4())
 
 
 dir = os.path.dirname(__file__)
