@@ -507,7 +507,7 @@ def user_is_project_leader(user, project):
 		filters={
 			"user": user,
 			"parent": project,
-			"custom_assign_role": ["in", ["Projectleider", "Uitvoerder"]]
+			"custom_project_role": ["in", ["Projectleider", "Uitvoerder"]]
 		}
 	)
 	return len(project_leaders) > 0
