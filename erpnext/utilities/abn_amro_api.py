@@ -244,6 +244,26 @@ class AbnAmroAPI:
 		response = requests.post(url, headers=headers, json=payload)
 
 		# Check the response
+		if response.status_code == 200 or response.status_code == 201:
+			return response.json()
+		else:
+			return None
+
+	def get_payment_status(self, access_token, payment_id):
+		# Define the headers
+		headers = {
+			'Content-Type': 'application/json',
+			'Authorization': f'Bearer {access_token}',
+			'API-Key': 'tZSKde7sgfjB0A9GD72cBrLi2dvAoX8D'
+		}
+
+		# Define the URL
+		url = f'https://api-sandbox.abnamro.com/v1/customer-api/payments/{payment_id}/status'
+
+		# Send the GET request
+		response = requests.get(url, headers=headers)
+
+		# Check the response
 		if response.status_code == 200:
 			return response.json()
 		else:
