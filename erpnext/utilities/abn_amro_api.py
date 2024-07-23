@@ -1,3 +1,6 @@
+import base64
+import gzip
+
 import requests
 import os
 import uuid
@@ -13,7 +16,7 @@ def update_xml_element(root, namespaces, xpath, new_value):
         element.text = new_value
 
 class AbnAmroAPI:
-	def __init__(self, client_id, cert_path, key_path, api_key, scope, payment_scope, api_url, base64_sct_file_data):
+	def __init__(self, client_id, cert_path, key_path, api_key, scope, payment_scope, api_url, sample_sct_file_path):
 		self.client_id = client_id
 		self.cert_path = cert_path
 		self.key_path = key_path
@@ -21,7 +24,7 @@ class AbnAmroAPI:
 		self.scope = scope
 		self.api_url = api_url
 		self.payment_scope = payment_scope
-		self.base64_sct_file_data = base64_sct_file_data
+		self.sample_sct_file_path = sample_sct_file_path
 
 
 	def get_headers(self, access_token):
@@ -231,7 +234,7 @@ class AbnAmroAPI:
 		else:
 			return None
 
-	def initiate_payment(self, access_token, x_request_id):
+	def initiate_payment(self, access_token, x_request_id, base64_sct_file_data):
 		# Define the headers
 		headers = {
 			'Accept': 'application/json',
@@ -247,7 +250,7 @@ class AbnAmroAPI:
 		# define the payload
 		payload = {
 			'fileName': 'SampleSCT.xml.lz',
-			'fileData': self.base64_sct_file_data
+			'fileData': base64_sct_file_data
 		}
 
 		# Send the POST request
@@ -258,6 +261,25 @@ class AbnAmroAPI:
 			return response.json()
 		else:
 			return None
+
+	def gzip_sct_file_then_base64_encode(self):
+		# Define the path to the XML file
+		xml_file_path = self.sample_sct_file_path
+
+		# Read the XML file
+		with open(xml_file_path, 'rb') as file:
+			xml_data = file.read()
+
+		# Compress the XML data
+		compressed_data = gzip.compress(xml_data)
+
+		# Encode the compressed data as base64
+		base64_data = base64.b64encode(compressed_data)
+
+		decoded_base64_data = base64_data.decode('utf-8')
+
+		# Return the base64 encoded data
+		return decoded_base64_data
 
 	def get_payment_status(self, access_token, payment_id):
 		# Define the headers
@@ -289,7 +311,7 @@ class AbnAmroAPI:
 		# Format the date as '2019-05-21'
 		executation_date = current_datetime.strftime('%Y-%m-%d')
 		# Define the path to the XML file
-		xml_file_path = sample_sct_file_path
+		xml_file_path = self.sample_sct_file_path
 
 		# Register the default namespace to avoid 'ns0' prefix
 		ET.register_namespace('', 'urn:iso:std:iso:20022:tech:xsd:pain.001.001.03')
@@ -305,13 +327,13 @@ class AbnAmroAPI:
 			'.//ns:CreDtTm': create_datetime,
 			'.//ns:GrpHdr/ns:CtrlSum': str(payment_details["paid_amount"]),
 			'.//ns:InitgPty/ns:Nm': payment_details['initiating_party_name'],
-			'.//ns:PmtInf/ns:PmtInfId': str(payment_details['payment_information_id']),
+			'.//ns:PmtInf/ns:PmtInfId': payment_details['payment_information_id'],
 			'.//ns:PmtInf/ns:CtrlSum': str(payment_details["paid_amount"]),
 			'.//ns:ReqdExctnDt': executation_date,
 			'.//ns:PmtInf/ns:Dbtr/ns:Nm': payment_details['initiating_party_name'],
 			'.//ns:PmtInf/ns:DbtrAcct/ns:Id/ns:IBAN': payment_details['company_iban'],
 			'.//ns:PmtInf/ns:DbtrAgt/ns:FinInstnId/ns:BIC': payment_details['company_swift_code'],
-			'.//ns:PmtInf/ns:CdtTrfTxInf/ns:PmtId/ns:EndToEndId': str(payment_details['end_to_end_id']),
+			'.//ns:PmtInf/ns:CdtTrfTxInf/ns:PmtId/ns:EndToEndId': payment_details['end_to_end_id'],
 			'.//ns:PmtInf/ns:CdtTrfTxInf/ns:Amt/ns:InstdAmt': str(payment_details['paid_amount']),
 			'.//ns:PmtInf/ns:CdtTrfTxInf/ns:CdtrAgt/ns:FinInstnId/ns:BIC': payment_details['party_swift_code'],
 			'.//ns:PmtInf/ns:CdtTrfTxInf/ns:Cdtr/ns:Nm': payment_details['party_name'],
@@ -326,6 +348,9 @@ class AbnAmroAPI:
 		# Write the modified XML back to the file or use it as needed
 		tree.write(xml_file_path, xml_declaration=True, encoding='utf-8', method="xml")
 
+		return
+
+
 	def generate_x_request_id(self):
 		return str(uuid.uuid4())
 
@@ -335,8 +360,6 @@ certificate_path = os.path.join(dir, 'CertificateCommercial.crt')
 private_key_path = os.path.join(dir, 'PrivateKeyCommercial.key')
 sample_sct_file_path = os.path.join(dir, 'SampleSCT.XML')
 
-test_x_request_id = 'bc69c490-9524-413f-971a-21f1aecd9fe5'
-
 abn_amro_api = AbnAmroAPI('test_client',
 						  certificate_path,
 						  private_key_path,
@@ -344,4 +367,4 @@ abn_amro_api = AbnAmroAPI('test_client',
 						  'account:balance:read account:details:read account:transaction:read',
 						  'payment:unsigned:write payment:status:read',
 						  'https://auth-mtls-sandbox.abnamro.com/as/token.oauth2',
-						  'H4sICFchkWYAA1NhbXBsZVNDVC5YTUwAtVXLjtowFN1X6j9E2ZOHgQGi4FEI0NICgyBU3SFIDEQihjrmMf363jgw0MSe6aaRILHPvee+bff5kuy0E2FpvKdt3TYsXSM03Ecx3bT1edCvNPVn/PmT292Hx4RQroE8Tdv6kVEnTvdOyiPxRpaFkMNJuHUuaeQcljE1LMvOf1U9VwMobutbzg+OaZ7PZ+NcNfZsY4Kybf4cDWfhliTLSkxTvqQh0cGwBo/rpzxhfsQDth7QmNPrvsC+sMPXiD3siN1RuhlE2Moe2zXzVUHEZ6TLgwQjy25VrHoF2YHdcOrIQQ3XvIEFnfHqZR1cUgyct88iK2e72THBtoEsoLmuCkJZEJsJf8XuOMHfd0vK6XKZAGdJ0nwTfQjZLMXsThI+oOuidr4Loc/8YNELFqNg8e1IyQKB/29YWWfEIxxM+0Im+/4/SQDy4FB2WmCzUzg87SRITg8B9SYeMBd9y9Mj1RbRyAy6U/Ir6l1CTrv8oRlc83G/oNJd8WLL5alJcJesYk6OTFpNiZ7g8sKwaENgpfLckY43xuPhE/I6Y68FT7Nm1xotaJgMkGWlXGpTYTp3aSP1qB/TAYwnVXvWGfg4c2o8RFCibCXzRslz9apk3fW3bNNheDbs/YDK54uiiDgigouiq7KWV7rdo1Gwhz+QeKG/icbImjA48GLiaDaq1upPrvkgI4tJxe96iSyXAsqSEAGu+eFrW+/Np/p1am6A1JJiH+JX1E3AH9ZOSP1L/XIv3uXLplPZRRmkooWxgdM3Ug3RnVuZAfkwCfzDgbLvA9V4qqOqcqByP94LXTHTU9lR/ZfEPOUswlOyNrLjCK7PJvRevikzJiUUPkiG4Xbw365WU3K3wgheb3tY/AE1BZs6IggAAA==')
+						  sample_sct_file_path)

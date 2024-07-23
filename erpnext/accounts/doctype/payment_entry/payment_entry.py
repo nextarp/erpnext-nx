@@ -1644,8 +1644,9 @@ def initiate_payment_from_payment_entry(frappe_doc):
 			company_bank_account = frappe.get_doc("Bank Account", company_bank_account_name)
 			party_bank_account = frappe.get_doc("Bank Account", party_bank_account_name)
 
-			payment_information_id = uuid.uuid4()
-			end_to_end_id = uuid.uuid4()
+			payment_information_id = str(uuid.uuid4())
+			end_to_end_id = str(uuid.uuid4())
+			request_id = str(uuid.uuid4())
 
 			# Extracted fields from main_object and bank account details
 			payment_details = {
@@ -1664,11 +1665,28 @@ def initiate_payment_from_payment_entry(frappe_doc):
 
 			abn_amro_api.update_sct_file_from_payment_details(payment_details)
 
+			base64_encoded_sct_data = abn_amro_api.gzip_sct_file_then_base64_encode()
+
+			payment_token = abn_amro_api.get_access_payment_token()
+
+			initiate_payment_response = abn_amro_api.initiate_payment(payment_token, request_id, base64_encoded_sct_data)
+
+			if initiate_payment_response:
+				# from the frappe_doc_dict update the real payment entry object
+				payment_entry_object = frappe.get_doc(frappe_doc_dict['doctype'], frappe_doc_dict['name'])
+				payment_entry_object.custom_payment_id = initiate_payment_response.get("paymentId")
+				payment_entry_object.custom_end_to_end_id = end_to_end_id
+				payment_entry_object.custom_payment_information_id = payment_information_id
+
+				payment_entry_object.save()
+
+
+
 			return "Payment initiated for document: " + str(main_object.name)
 		else:
 			return "Reference name or doctype is missing."
 	else:
-		return "No references found."
+		return "No purchase invoice is found."
 
 @frappe.whitelist()
 def get_outstanding_reference_documents(args, validate=False):
