@@ -9,7 +9,7 @@ erpnext.accounts.taxes.setup_tax_filters("Advance Taxes and Charges");
 
 frappe.ui.form.on("Payment Entry", {
 	after_workflow_action: function (frm) {
-		if (frm.doc.workflow_state === "Approved") {
+		if (frm.doc.workflow_state === "Approved" && frm.doc.payment_type === "Pay") {
 			// send an backend request to the backend in order to initiate the payment
 			console.log("Initiatingasdasfjkhasfkjahsdfaskfjh payment");
 			frappe.call({
@@ -19,7 +19,8 @@ frappe.ui.form.on("Payment Entry", {
 				},
 				callback: function (r) {
 					if (r.message) {
-						frappe.show_alert(r.message);
+						frappe.show_alert(r.message); // Show alert for 5 seconds
+						location.reload(true); // Perform a hard reload
 					}
 				},
 			});

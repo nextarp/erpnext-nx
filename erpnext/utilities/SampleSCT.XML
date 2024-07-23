@@ -1,27 +1,27 @@
-<?xml version='1.0' encoding='utf-8'?>
-<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.001.001.03">
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.001.001.03" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <CstmrCdtTrfInitn>
         <GrpHdr>
             <MsgId>000001</MsgId>
-            <CreDtTm>2024-07-23T13:02:01</CreDtTm>
+            <CreDtTm>2019-05-21T17:52:27</CreDtTm>
             <NbOfTxs>1</NbOfTxs>
-            <CtrlSum>13.31</CtrlSum>
-            <InitgPty><Nm>Abn Amro Bank Account</Nm>
+            <CtrlSum>1.20</CtrlSum>
+            <InitgPty><Nm>Klantnaam</Nm>
             </InitgPty>
         </GrpHdr>
         <PmtInf>
-            <PmtInfId>35c91837-7fbf-43a3-9f8d-1820abb32c6f</PmtInfId>
+            <PmtInfId>SCT_ET_MT_June_21</PmtInfId>
             <PmtMtd>TRF</PmtMtd>
             <NbOfTxs>1</NbOfTxs>
-            <CtrlSum>13.31</CtrlSum>
+            <CtrlSum>1.20</CtrlSum>
             <PmtTpInf>
                 <SvcLvl>
                     <Cd>SEPA</Cd>
                 </SvcLvl>
             </PmtTpInf>
-            <ReqdExctnDt>2024-07-23</ReqdExctnDt>
+            <ReqdExctnDt>2019-05-21</ReqdExctnDt>
             <Dbtr>
-                <Nm>Abn Amro Bank Account</Nm>
+                <Nm>Debiteur</Nm>
             </Dbtr>
             <DbtrAcct>
                 <Id>
@@ -36,10 +36,10 @@
             <ChrgBr>SLEV</ChrgBr>
             <CdtTrfTxInf>
                 <PmtId>
-                    <EndToEndId>544155c8-9596-4593-8f0f-a16f935d5242</EndToEndId>
+                    <EndToEndId>Onze referentie: 123456</EndToEndId>
                 </PmtId>
                 <Amt>
-                    <InstdAmt Ccy="EUR">13.31</InstdAmt>
+                    <InstdAmt Ccy="EUR">1.20</InstdAmt>
                 </Amt>
                 <CdtrAgt>
                     <FinInstnId>
@@ -47,15 +47,15 @@
                     </FinInstnId>
                 </CdtrAgt>
                 <Cdtr>
-                    <Nm>signify bank account</Nm>
+                    <Nm>Crediteur</Nm>
                 </Cdtr>
                 <CdtrAcct>
                     <Id>
-                    <IBAN>NL05GILL0466067313</IBAN>
+                    <IBAN>NL12ABNA9999876523</IBAN>
                     </Id>
                 </CdtrAcct>
                 <RmtInf>
-                        <Ustrd>factuur: 124</Ustrd>
+                        <Ustrd>Ref.2019.0386</Ustrd>
                 </RmtInf>
             </CdtTrfTxInf>
         </PmtInf>

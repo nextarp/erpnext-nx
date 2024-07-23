@@ -1672,15 +1672,12 @@ def initiate_payment_from_payment_entry(frappe_doc):
 			initiate_payment_response = abn_amro_api.initiate_payment(payment_token, request_id, base64_encoded_sct_data)
 
 			if initiate_payment_response:
-				# from the frappe_doc_dict update the real payment entry object
-				payment_entry_object = frappe.get_doc(frappe_doc_dict['doctype'], frappe_doc_dict['name'])
-				payment_entry_object.custom_payment_id = initiate_payment_response.get("paymentId")
-				payment_entry_object.custom_end_to_end_id = end_to_end_id
-				payment_entry_object.custom_payment_information_id = payment_information_id
-
-				payment_entry_object.save()
-
-
+				frappe.db.sql(
+					"""UPDATE `tabPayment Entry`
+					SET custom_payment_id = %s, custom_end_to_end_id = %s, custom_payment_information_id = %s
+					WHERE name = %s""",
+					(initiate_payment_response.get("paymentId"), end_to_end_id, payment_information_id, frappe_doc_dict["name"])
+				)
 
 			return "Payment initiated for document: " + str(main_object.name)
 		else:
