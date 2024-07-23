@@ -24,7 +24,7 @@ from erpnext.stock.doctype.item.item import get_item_defaults, get_uom_conv_fact
 from erpnext.stock.doctype.item_manufacturer.item_manufacturer import get_item_manufacturer_part_no
 from erpnext.stock.doctype.price_list.price_list import get_price_list_details
 
-sales_doctypes = ["Quotation", "Sales Order", "Delivery Note", "Sales Invoice", "POS Invoice"]
+sales_doctypes = ["Quotation", "Sales Order", "Delivery Note", "Sales Invoice", "POS Invoice", "Project"]
 purchase_doctypes = [
 	"Material Request",
 	"Supplier Quotation",
@@ -86,7 +86,7 @@ def get_item_details(args, doc=None, for_validate=False, overwrite_warehouse=Tru
 
 	get_party_item_code(args, item, out)
 
-	if args.get("doctype") in ["Sales Order", "Quotation"]:
+	if args.get("doctype") in ["Sales Order", "Quotation", "Project"]:
 		set_valuation_rate(out, args)
 
 	update_party_blanket_order(args, out)
@@ -434,6 +434,8 @@ def get_basic_details(args, item, overwrite_warehouse=True):
 			)
 
 	child_doctype = args.doctype + " Item"
+	if args.doctype == "Project":
+		child_doctype = "Project Items"
 	meta = frappe.get_meta(child_doctype)
 	if meta.get_field("barcode"):
 		update_barcode_value(out)
@@ -1258,7 +1260,7 @@ def get_price_list_currency_and_exchange_rate(args):
 	if not args.price_list:
 		return {}
 
-	if args.doctype in ["Quotation", "Sales Order", "Delivery Note", "Sales Invoice"]:
+	if args.doctype in ["Quotation", "Sales Order", "Delivery Note", "Sales Invoice", "Project"]:
 		args.update({"exchange_rate": "for_selling"})
 	elif args.doctype in ["Purchase Order", "Purchase Receipt", "Purchase Invoice"]:
 		args.update({"exchange_rate": "for_buying"})

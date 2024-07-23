@@ -41,6 +41,7 @@ class ProjectItems(Document):
 		grant_commission: DF.Check
 		gross_profit: DF.Currency
 		image: DF.Attach | None
+		invoiced: DF.Float
 		is_free_item: DF.Check
 		is_stock_item: DF.Check
 		item_code: DF.Link
@@ -54,6 +55,7 @@ class ProjectItems(Document):
 		material_request_item: DF.Data | None
 		net_amount: DF.Currency
 		net_rate: DF.Currency
+		ordered: DF.Float
 		ordered_qty: DF.Float
 		page_break: DF.Check
 		parent: DF.Data

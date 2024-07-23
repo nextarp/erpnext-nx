@@ -207,6 +207,48 @@ frappe.ui.form.on("Project Attachments", {
 	}
 });
 
+frappe.ui.form.on("Project Items", {
+	item_code: function (frm, cdt, cdn) {
+		var row = frappe.get_doc(cdt, cdn);
+		if (row.item_code) {
+			frappe.call({
+				method: "erpnext.stock.get_item_details.get_item_details",
+				args: {
+					"args": {
+						"item_code": row.item_code,
+						"company": frm.doc.company,
+						"doctype": frm.doc.doctype,
+					}
+				},
+				callback: function (r) {
+					if (r.message) {
+						frappe.model.set_value(cdt, cdn, "item_name", r.message.item_name);
+						frappe.model.set_value(cdt, cdn, "rate", r.message.valuation_rate);
+						frappe.model.set_value(cdt, cdn, "description", r.message.description);
+						frappe.model.set_value(cdt, cdn, "uom", r.message.stock_uom);
+						frappe.model.set_value(cdt, cdn, "qty", 1);
+						frappe.model.set_value(cdt, cdn, "amount", r.message.valuation_rate * 1);
+						frappe.model.set_value(cdt, cdn, "conversion_factor", 1);
+					}
+				},
+			});
+		}
+	},
+	qty: function (frm, cdt, cdn) {
+		var row = frappe.get_doc(cdt, cdn);
+		if (row.qty && row.rate) {
+			frappe.model.set_value(cdt, cdn, "amount", row.qty * row.rate);
+		}
+	},
+
+	rate: function (frm, cdt, cdn) {
+		var row = frappe.get_doc(cdt, cdn);
+		if (row.qty && row.rate) {
+			frappe.model.set_value(cdt, cdn, "amount", row.qty * row.rate);
+		}
+	},
+});
+
 function open_form(frm, doctype, child_doctype, parentfield) {
 	frappe.model.with_doctype(doctype, () => {
 		let new_doc = frappe.model.get_new_doc(doctype);

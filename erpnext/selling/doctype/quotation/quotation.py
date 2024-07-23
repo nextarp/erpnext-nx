@@ -479,7 +479,7 @@ def make_project(source_name, target_doc=None):
 			"doctype": "Project Items",
 			"field_map": {
 				"parent": "quotation",
-				"parentfield": "itemss",
+				"parentfield": "items",
 				"parenttype": "Project"
 			},
 		}

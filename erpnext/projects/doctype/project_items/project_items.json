@@ -25,6 +25,8 @@
   "quantity_and_rate",
   "qty",
   "stock_uom",
+  "ordered",
+  "invoiced",
   "col_break2",
   "uom",
   "conversion_factor",
@@ -108,7 +110,7 @@
  "fields": [
   {
    "bold": 1,
-   "columns": 3,
+   "columns": 2,
    "fieldname": "item_code",
    "fieldtype": "Link",
    "in_global_search": 1,
@@ -170,9 +172,11 @@
    "print_hide": 1
   },
   {
+   "columns": 2,
    "fieldname": "item_name",
    "fieldtype": "Data",
    "in_global_search": 1,
+   "in_list_view": 1,
    "label": "Item Name",
    "oldfieldname": "item_name",
    "oldfieldtype": "Data",
@@ -273,8 +277,10 @@
    "fieldtype": "Column Break"
   },
   {
+   "columns": 1,
    "fieldname": "uom",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "UOM",
    "options": "UOM",
    "reqd": 1
@@ -405,7 +411,7 @@
    "precision": "2"
   },
   {
-   "columns": 2,
+   "columns": 1,
    "depends_on": "eval: doc.type != \"\"",
    "fieldname": "rate",
    "fieldtype": "Currency",
@@ -418,7 +424,7 @@
    "width": "100px"
   },
   {
-   "columns": 2,
+   "columns": 1,
    "fieldname": "amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
@@ -615,7 +621,6 @@
    "depends_on": "eval:doc.delivered_by_supplier!=1",
    "fieldname": "warehouse",
    "fieldtype": "Link",
-   "in_list_view": 1,
    "label": "Delivery Warehouse",
    "oldfieldname": "reserved_warehouse",
    "oldfieldtype": "Link",
@@ -895,11 +900,27 @@
   {
    "fieldname": "column_break_brfs",
    "fieldtype": "Column Break"
+  },
+  {
+   "columns": 1,
+   "fieldname": "ordered",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Ordered",
+   "read_only": 1
+  },
+  {
+   "columns": 1,
+   "fieldname": "invoiced",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Invoiced",
+   "read_only": 1
   }
  ],
  "istable": 1,
  "links": [],
- "modified": "2024-07-12 14:03:43.232742",
+ "modified": "2024-07-23 16:06:28.733184",
  "modified_by": "Administrator",
  "module": "Projects",
  "name": "Project Items",
