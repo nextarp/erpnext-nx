@@ -74,6 +74,9 @@ frappe.ui.form.on("Project", {
 			frm.trigger("show_dashboard");
 		}
 		frm.trigger("set_custom_buttons");
+
+		get_ordered_items(frm);
+		get_invoiced_items(frm);
 	},
 
 	set_custom_buttons: function (frm) {
@@ -263,5 +266,55 @@ function open_form(frm, doctype, child_doctype, parentfield) {
 		new_doc.project = frm.doc.name;
 
 		frappe.ui.form.make_quick_entry(doctype, null, null, new_doc);
+	});
+}
+
+function get_ordered_items(frm) {
+	frappe.call({
+		method: "erpnext.projects.doctype.project.project.get_items_in_sales_order",
+		args: {
+			project: frm.doc.name,
+		},
+		callback: function (r) {
+			let items = r.message;
+			let project_items = frm.doc.custom_project_items || [];
+			let updated = false;
+			for (let i = 0; i < project_items.length; i++) {
+				let item = project_items[i];
+				let found = items.find((x) => x.item_code === item.item_code);
+				if (found) {
+					frappe.model.set_value(item.doctype, item.name, "ordered", found.qty);
+					updated = true;
+				}
+			}
+			if (updated) {
+				frm.refresh_field("custom_project_items");
+			}
+		},
+	});
+}
+
+function get_invoiced_items(frm) {
+	frappe.call({
+		method: "erpnext.projects.doctype.project.project.get_items_in_sales_invoice",
+		args: {
+			project: frm.doc.name,
+		},
+		callback: function (r) {
+			let items = r.message;
+			let project_items = frm.doc.custom_project_items || [];
+			let updated = false;
+			for (let i = 0; i < project_items.length; i++) {
+				let item = project_items[i];
+				let found = items.find((x) => x.item_code === item.item_code);
+				if (found) {
+					frappe.model.set_value(item.doctype, item.name, "invoiced", found.qty);
+					updated = true;
+				}
+			}
+			if (updated) {
+				frm.refresh_field("custom_project_items");
+			}
+		},
 	});
 }

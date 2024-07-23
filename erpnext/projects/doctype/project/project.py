@@ -766,3 +766,23 @@ def recalculate_project_total_purchase_cost(project: str | None = None):
 			"total_purchase_cost",
 			(total_purchase_cost and total_purchase_cost[0][0] or 0),
 		)
+
+
+@frappe.whitelist()
+def get_items_in_sales_order(project):
+	return frappe.db.sql(
+		"""select item_code, item_name, qty, base_net_rate, base_net_amount
+		from `tabSales Order Item` where parent in (select name from `tabSales Order` where project=%s and status='To Deliver and Bill')""",
+		project,
+		as_dict=1,
+	)
+
+
+@frappe.whitelist()
+def get_items_in_sales_invoice(project):
+	return frappe.db.sql(
+		"""select item_code, item_name, qty, base_rate, base_net_amount
+		from `tabSales Invoice Item` where parent in (select name from `tabSales Invoice` where project=%s and docstatus=1)""",
+		project,
+		as_dict=1,
+	)
