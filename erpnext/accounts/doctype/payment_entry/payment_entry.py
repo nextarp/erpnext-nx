@@ -46,6 +46,7 @@ from erpnext.controllers.accounts_controller import (
 )
 from erpnext.setup.utils import get_exchange_rate
 from erpnext.utilities.abn_amro_api import abn_amro_api
+import uuid
 
 
 class InvalidPaymentEntry(ValidationError):
@@ -108,12 +109,6 @@ class PaymentEntry(AccountsController):
 		self.update_advance_paid()
 		self.update_payment_schedule()
 		self.set_status()
-
-	def before_save(self):
-		# initiate the payment
-		if self.payment_type == "Pay":
-			payment_id = initiate_payment()
-			self.custom_payment_id = payment_id
 
 	def set_liability_account(self):
 		# Auto setting liability account should only be done during 'draft' status
@@ -1620,6 +1615,60 @@ def validate_inclusive_tax(tax, doc):
 		elif tax.get("category") == "Valuation":
 			frappe.throw(_("Valuation type charges can not be marked as Inclusive"))
 
+
+@frappe.whitelist()
+def initiate_payment_from_payment_entry(frappe_doc):
+	# Step 1: Load the frappe_doc JSON string into a Python dictionary
+	frappe_doc_dict = json.loads(frappe_doc)
+
+	# Step 2: Access the references list from the frappe_doc_dict
+	references = frappe_doc_dict.get("references", [])
+
+	# Ensure references list is not empty
+	if references:
+		# Step 3: Get the first reference from the references list
+		first_reference = references[0]
+
+		# Step 4: Extract the reference_name and reference_doctype from the first reference
+		reference_name = first_reference.get("reference_name")
+		reference_doctype = first_reference.get("reference_doctype")
+
+		# Step 5: Fetch the main object using frappe.get_doc
+		if reference_name and reference_doctype:
+			main_object = frappe.get_doc(reference_doctype, reference_name)
+
+			company_bank_account_name = frappe_doc_dict.get("bank_account")
+			party_bank_account_name = frappe_doc_dict.get("party_bank_account")
+
+			# from the name get the bank account details
+			company_bank_account = frappe.get_doc("Bank Account", company_bank_account_name)
+			party_bank_account = frappe.get_doc("Bank Account", party_bank_account_name)
+
+			payment_information_id = uuid.uuid4()
+			end_to_end_id = uuid.uuid4()
+
+			# Extracted fields from main_object and bank account details
+			payment_details = {
+				"invoice_number": main_object.get("custom_invoice_number"),
+				"paid_amount": frappe_doc_dict.get("paid_amount"),
+				"currency": frappe_doc_dict.get("paid_from_account_currency"),
+				"initiating_party_name": company_bank_account.get("account_name"),
+				"party_name": party_bank_account.get("account_name"),
+				"company_swift_code": company_bank_account.get("custom_bicswift_code"),
+				"party_swift_code": party_bank_account.get("custom_bicswift_code"),
+				"company_iban": company_bank_account.get("iban"),
+				"party_iban": party_bank_account.get("iban"),
+				"payment_information_id": payment_information_id,
+				"end_to_end_id": end_to_end_id,
+			}
+
+			abn_amro_api.update_sct_file_from_payment_details(payment_details)
+
+			return "Payment initiated for document: " + str(main_object.name)
+		else:
+			return "Reference name or doctype is missing."
+	else:
+		return "No references found."
 
 @frappe.whitelist()
 def get_outstanding_reference_documents(args, validate=False):

@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.001.001.03">
+    <CstmrCdtTrfInitn>
+        <GrpHdr>
+            <MsgId>000001</MsgId>
+            <CreDtTm>2024-07-23T13:02:01</CreDtTm>
+            <NbOfTxs>1</NbOfTxs>
+            <CtrlSum>13.31</CtrlSum>
+            <InitgPty><Nm>Abn Amro Bank Account</Nm>
+            </InitgPty>
+        </GrpHdr>
+        <PmtInf>
+            <PmtInfId>35c91837-7fbf-43a3-9f8d-1820abb32c6f</PmtInfId>
+            <PmtMtd>TRF</PmtMtd>
+            <NbOfTxs>1</NbOfTxs>
+            <CtrlSum>13.31</CtrlSum>
+            <PmtTpInf>
+                <SvcLvl>
+                    <Cd>SEPA</Cd>
+                </SvcLvl>
+            </PmtTpInf>
+            <ReqdExctnDt>2024-07-23</ReqdExctnDt>
+            <Dbtr>
+                <Nm>Abn Amro Bank Account</Nm>
+            </Dbtr>
+            <DbtrAcct>
+                <Id>
+                    <IBAN>NL62ABNA9999841479</IBAN>
+                </Id>
+            </DbtrAcct>
+            <DbtrAgt>
+                <FinInstnId>
+                    <BIC>ABNANL2A</BIC>
+                </FinInstnId>
+            </DbtrAgt>
+            <ChrgBr>SLEV</ChrgBr>
+            <CdtTrfTxInf>
+                <PmtId>
+                    <EndToEndId>544155c8-9596-4593-8f0f-a16f935d5242</EndToEndId>
+                </PmtId>
+                <Amt>
+                    <InstdAmt Ccy="EUR">13.31</InstdAmt>
+                </Amt>
+                <CdtrAgt>
+                    <FinInstnId>
+                        <BIC>ABNANL2A</BIC>
+                    </FinInstnId>
+                </CdtrAgt>
+                <Cdtr>
+                    <Nm>signify bank account</Nm>
+                </Cdtr>
+                <CdtrAcct>
+                    <Id>
+                    <IBAN>NL05GILL0466067313</IBAN>
+                    </Id>
+                </CdtrAcct>
+                <RmtInf>
+                        <Ustrd>factuur: 124</Ustrd>
+                </RmtInf>
+            </CdtTrfTxInf>
+        </PmtInf>
+    </CstmrCdtTrfInitn>
+</Document>

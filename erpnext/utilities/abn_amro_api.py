@@ -1,6 +1,16 @@
 import requests
 import os
 import uuid
+import xml.etree.ElementTree as ET
+from datetime import datetime
+
+def update_xml_element(root, namespaces, xpath, new_value):
+    """
+    Find an element in an XML tree and update its text.
+    """
+    element = root.find(xpath, namespaces)
+    if element is not None:
+        element.text = new_value
 
 class AbnAmroAPI:
 	def __init__(self, client_id, cert_path, key_path, api_key, scope, payment_scope, api_url, base64_sct_file_data):
@@ -269,6 +279,53 @@ class AbnAmroAPI:
 		else:
 			return None
 
+	def update_sct_file_from_payment_details(self, payment_details):
+		# Get the current datetime
+		current_datetime = datetime.now()
+
+		# Format the datetime as '2019-05-21T17:52:27'
+		create_datetime = current_datetime.strftime('%Y-%m-%dT%H:%M:%S')
+
+		# Format the date as '2019-05-21'
+		executation_date = current_datetime.strftime('%Y-%m-%d')
+		# Define the path to the XML file
+		xml_file_path = sample_sct_file_path
+
+		# Register the default namespace to avoid 'ns0' prefix
+		ET.register_namespace('', 'urn:iso:std:iso:20022:tech:xsd:pain.001.001.03')
+
+		# Parse the XML file
+		tree = ET.parse(xml_file_path)
+		root = tree.getroot()
+
+		# Define the namespaces to find tags correctly
+		namespaces = {'ns': 'urn:iso:std:iso:20022:tech:xsd:pain.001.001.03'}
+
+		updates = {
+			'.//ns:CreDtTm': create_datetime,
+			'.//ns:GrpHdr/ns:CtrlSum': str(payment_details["paid_amount"]),
+			'.//ns:InitgPty/ns:Nm': payment_details['initiating_party_name'],
+			'.//ns:PmtInf/ns:PmtInfId': str(payment_details['payment_information_id']),
+			'.//ns:PmtInf/ns:CtrlSum': str(payment_details["paid_amount"]),
+			'.//ns:ReqdExctnDt': executation_date,
+			'.//ns:PmtInf/ns:Dbtr/ns:Nm': payment_details['initiating_party_name'],
+			'.//ns:PmtInf/ns:DbtrAcct/ns:Id/ns:IBAN': payment_details['company_iban'],
+			'.//ns:PmtInf/ns:DbtrAgt/ns:FinInstnId/ns:BIC': payment_details['company_swift_code'],
+			'.//ns:PmtInf/ns:CdtTrfTxInf/ns:PmtId/ns:EndToEndId': str(payment_details['end_to_end_id']),
+			'.//ns:PmtInf/ns:CdtTrfTxInf/ns:Amt/ns:InstdAmt': str(payment_details['paid_amount']),
+			'.//ns:PmtInf/ns:CdtTrfTxInf/ns:CdtrAgt/ns:FinInstnId/ns:BIC': payment_details['party_swift_code'],
+			'.//ns:PmtInf/ns:CdtTrfTxInf/ns:Cdtr/ns:Nm': payment_details['party_name'],
+			'.//ns:PmtInf/ns:CdtTrfTxInf/ns:CdtrAcct/ns:Id/ns:IBAN': payment_details['party_iban'],
+			'.//ns:PmtInf/ns:CdtTrfTxInf/ns:RmtInf/ns:Ustrd': f'factuur: {payment_details["invoice_number"]}'
+		}
+
+		# Update the XML file
+		for xpath, new_value in updates.items():
+			update_xml_element(root, namespaces, xpath, new_value)
+
+		# Write the modified XML back to the file or use it as needed
+		tree.write(xml_file_path, xml_declaration=True, encoding='utf-8', method="xml")
+
 	def generate_x_request_id(self):
 		return str(uuid.uuid4())
 
@@ -276,6 +333,7 @@ class AbnAmroAPI:
 dir = os.path.dirname(__file__)
 certificate_path = os.path.join(dir, 'CertificateCommercial.crt')
 private_key_path = os.path.join(dir, 'PrivateKeyCommercial.key')
+sample_sct_file_path = os.path.join(dir, 'SampleSCT.XML')
 
 test_x_request_id = 'bc69c490-9524-413f-971a-21f1aecd9fe5'
 
