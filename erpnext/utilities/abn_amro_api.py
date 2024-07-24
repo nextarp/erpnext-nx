@@ -16,7 +16,9 @@ def update_xml_element(root, namespaces, xpath, new_value):
         element.text = new_value
 
 class AbnAmroAPI:
-	def __init__(self, client_id, cert_path, key_path, api_key, scope, payment_scope, api_url, sample_sct_file_path):
+	def __init__(self, client_id, cert_path, key_path,
+				 api_key,scope, payment_scope, api_url,
+				 sample_sct_file_path, payment_api_key):
 		self.client_id = client_id
 		self.cert_path = cert_path
 		self.key_path = key_path
@@ -25,6 +27,7 @@ class AbnAmroAPI:
 		self.api_url = api_url
 		self.payment_scope = payment_scope
 		self.sample_sct_file_path = sample_sct_file_path
+		self.payment_api_key = payment_api_key
 
 
 	def get_headers(self, access_token):
@@ -241,7 +244,7 @@ class AbnAmroAPI:
 			'Authorization': f'Bearer {access_token}',
 			'X-Request-ID': x_request_id,
 			'Content-Type': 'application/json',
-			'API-Key': 'tZSKde7sgfjB0A9GD72cBrLi2dvAoX8D'
+			'API-Key': self.payment_api_key
 		}
 
 		# Define the URL
@@ -368,6 +371,7 @@ class AbnAmroAPI:
 		return str(uuid.uuid4())
 
 
+
 dir = os.path.dirname(__file__)
 certificate_path = os.path.join(dir, 'CertificateCommercial.crt')
 private_key_path = os.path.join(dir, 'PrivateKeyCommercial.key')
@@ -380,4 +384,4 @@ abn_amro_api = AbnAmroAPI('test_client',
 						  'account:balance:read account:details:read account:transaction:read',
 						  'payment:unsigned:write payment:status:read',
 						  'https://auth-mtls-sandbox.abnamro.com/as/token.oauth2',
-						  sample_sct_file_path)
+						  sample_sct_file_path, 'tZSKde7sgfjB0A9GD72cBrLi2dvAoX8D')

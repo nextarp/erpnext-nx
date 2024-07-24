@@ -126,10 +126,12 @@ def make_bank_account(doctype, docname):
 	return doc
 
 @frappe.whitelist()
-def update_bank_account_credentials(name, custom_api_key, custom_client_id, custom_certificate, custom_private_key):
+def update_bank_account_credentials(name, custom_api_key, custom_client_id,
+									custom_certificate, custom_private_key, custom_payment_api_key):
 	try:
 		doc = frappe.get_doc("Bank Account", name)
 		doc.custom_api_key = custom_api_key
+		doc.custom_payment_api_key = custom_payment_api_key
 		doc.custom_client_id = custom_client_id
 		doc.custom_certificate = custom_certificate
 		doc.custom_private_key = custom_private_key

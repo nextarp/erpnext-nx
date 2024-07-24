@@ -87,6 +87,7 @@ frappe.ui.form.on("Bank Account", {
 											args: {
 												name: frm.doc.name,
 												custom_api_key: values.custom_api_key,
+												custom_payment_api_key: values.custom_payment_api_key,
 												custom_client_id: values.custom_client_id,
 												custom_certificate: values.custom_certificate,
 												custom_private_key: values.custom_private_key
