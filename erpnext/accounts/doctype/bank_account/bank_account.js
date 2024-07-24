@@ -19,7 +19,111 @@ frappe.ui.form.on("Bank Account", {
 		});
 	},
 	refresh: function (frm) {
-		frappe.dynamic_link = { doc: frm.doc, fieldname: "name", doctype: "Bank Account" };
+		// Add a new option to the three dots menu
+		frm.page.add_menu_item("Update API Credentials", function () {
+			// Fetch existing data
+			frappe.call({
+				method: "frappe.client.get",
+				args: {
+					doctype: "Bank Account",
+					name: frm.doc.name
+				},
+				callback: function (r) {
+					if (r.message) {
+						let data = r.message;
+
+						// Check if the bank account is a company account
+						if (data.is_company_account === 0) {
+							// Display an error message and cut the process
+							frappe.msgprint("Only company bank accounts can update credentials.");
+							return; // Stop execution
+						}
+
+						// Create and show the dialog
+						let dialog = new frappe.ui.Dialog({
+							title: 'Update API Credentials',
+							fields: [
+								{
+									label: 'API Key',
+									fieldname: 'custom_api_key',
+									fieldtype: 'Data',
+									default: data.custom_api_key
+								},
+								{
+									label: 'Payment API Key',
+									fieldname: 'custom_payment_api_key',
+									fieldtype: 'Data',
+									default: data.custom_payment_api_key
+								},
+								{
+									label: 'Client ID',
+									fieldname: 'custom_client_id',
+									fieldtype: 'Data',
+									default: data.custom_client_id
+								},
+								{
+									label: 'Certificate',
+									fieldname: 'custom_certificate',
+									fieldtype: 'Attach',
+									default: data.custom_certificate,
+								},
+								{
+									label: 'Private Key',
+									fieldname: 'custom_private_key',
+									fieldtype: 'Attach',
+									default: data.custom_private_key
+								}
+							],
+							primary_action_label: 'Update',
+							primary_action(values) {
+								dialog.hide();
+								// Ask for confirmation before sending the backend request
+								frappe.confirm(
+									'Are you sure you want to update the credentials? This action cannot be undone.',
+									function () {
+										// User confirmed, proceed with the backend request
+										frappe.call({
+											method: "erpnext.accounts.doctype.bank_account.bank_account.update_bank_account_credentials",
+											args: {
+												name: frm.doc.name,
+												custom_api_key: values.custom_api_key,
+												custom_client_id: values.custom_client_id,
+												custom_certificate: values.custom_certificate,
+												custom_private_key: values.custom_private_key
+											},
+											callback: function (response) {
+												if (response.message.status === "success") {
+													frappe.msgprint(response.message.message);
+													frm.reload_doc();
+												} else {
+													frappe.msgprint(response.message.message);
+												}
+											}
+										});
+									},
+									function () {
+										// User canceled, do nothing
+										console.log('Update canceled by the user.');
+									}
+								);
+							}
+						});
+						dialog.get_field("custom_certificate").df.options = {
+							restrictions: {
+								allowed_file_types: [".crt"],
+							},
+						};
+						dialog.get_field("custom_private_key").df.options = {
+							restrictions: {
+								allowed_file_types: [".key"],
+							},
+						};
+						dialog.show();
+					}
+				}
+			});
+		});
+		frappe.dynamic_link = {doc: frm.doc, fieldname: "name", doctype: "Bank Account"};
 
 		frm.toggle_display(["address_html", "contact_html"], !frm.doc.__islocal);
 

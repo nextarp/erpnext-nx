@@ -125,6 +125,21 @@ def make_bank_account(doctype, docname):
 
 	return doc
 
+@frappe.whitelist()
+def update_bank_account_credentials(name, custom_api_key, custom_client_id, custom_certificate, custom_private_key):
+	try:
+		doc = frappe.get_doc("Bank Account", name)
+		doc.custom_api_key = custom_api_key
+		doc.custom_client_id = custom_client_id
+		doc.custom_certificate = custom_certificate
+		doc.custom_private_key = custom_private_key
+		doc.save()
+		frappe.db.commit()
+		return {"status": "success", "message": "Bank account credentials updated successfully."}
+	except Exception as e:
+		frappe.log_error(message=str(e), title="Update Bank Account Credentials Error")
+		return {"status": "error", "message": "An error occurred while updating the bank account credentials."}
+
 
 def get_party_bank_account(party_type, party):
 	return frappe.db.get_value(

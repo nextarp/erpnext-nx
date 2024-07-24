@@ -20,7 +20,7 @@ frappe.ui.form.on("Payment Entry", {
 				callback: function (r) {
 					if (r.message) {
 						frappe.show_alert(r.message); // Show alert for 5 seconds
-						location.reload(true); // Perform a hard reload
+						frm.reload_doc(); // Perform a hard reload
 					}
 				},
 			});
