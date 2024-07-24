@@ -74,6 +74,12 @@ frappe.ui.form.on("Project", {
 			frm.trigger("show_dashboard");
 		}
 		frm.trigger("set_custom_buttons");
+
+		get_ordered_items(frm);
+		get_invoiced_items(frm);
+		calculate_total_amount(frm);
+		calculate_total_quantity(frm);
+		calculate_remaining_qty(frm);
 	},
 
 	set_custom_buttons: function (frm) {
@@ -207,6 +213,48 @@ frappe.ui.form.on("Project Attachments", {
 	}
 });
 
+frappe.ui.form.on("Project Items", {
+	item_code: function (frm, cdt, cdn) {
+		var row = frappe.get_doc(cdt, cdn);
+		if (row.item_code) {
+			frappe.call({
+				method: "erpnext.stock.get_item_details.get_item_details",
+				args: {
+					"args": {
+						"item_code": row.item_code,
+						"company": frm.doc.company,
+						"doctype": frm.doc.doctype,
+					}
+				},
+				callback: function (r) {
+					if (r.message) {
+						frappe.model.set_value(cdt, cdn, "item_name", r.message.item_name);
+						frappe.model.set_value(cdt, cdn, "rate", r.message.valuation_rate);
+						frappe.model.set_value(cdt, cdn, "description", r.message.description);
+						frappe.model.set_value(cdt, cdn, "uom", r.message.stock_uom);
+						frappe.model.set_value(cdt, cdn, "qty", 1);
+						frappe.model.set_value(cdt, cdn, "amount", r.message.valuation_rate * 1);
+						frappe.model.set_value(cdt, cdn, "conversion_factor", 1);
+					}
+				},
+			});
+		}
+	},
+	qty: function (frm, cdt, cdn) {
+		var row = frappe.get_doc(cdt, cdn);
+		if (row.qty && row.rate) {
+			frappe.model.set_value(cdt, cdn, "amount", row.qty * row.rate);
+		}
+	},
+
+	rate: function (frm, cdt, cdn) {
+		var row = frappe.get_doc(cdt, cdn);
+		if (row.qty && row.rate) {
+			frappe.model.set_value(cdt, cdn, "amount", row.qty * row.rate);
+		}
+	},
+});
+
 function open_form(frm, doctype, child_doctype, parentfield) {
 	frappe.model.with_doctype(doctype, () => {
 		let new_doc = frappe.model.get_new_doc(doctype);
@@ -221,5 +269,80 @@ function open_form(frm, doctype, child_doctype, parentfield) {
 		new_doc.project = frm.doc.name;
 
 		frappe.ui.form.make_quick_entry(doctype, null, null, new_doc);
+	});
+}
+
+function get_ordered_items(frm) {
+	frappe.call({
+		method: "erpnext.projects.doctype.project.project.get_items_in_sales_order",
+		args: {
+			project: frm.doc.name,
+		},
+		callback: function (r) {
+			let items = r.message;
+			let project_items = frm.doc.custom_project_items || [];
+			let updated = false;
+			for (let i = 0; i < project_items.length; i++) {
+				let item = project_items[i];
+				let found = items.find((x) => x.item_code === item.item_code);
+				if (found) {
+					frappe.model.set_value(item.doctype, item.name, "ordered", found.qty);
+					updated = true;
+				}
+			}
+			if (updated) {
+				frm.refresh_field("custom_project_items");
+			}
+		},
+	});
+}
+
+function get_invoiced_items(frm) {
+	frappe.call({
+		method: "erpnext.projects.doctype.project.project.get_items_in_sales_invoice",
+		args: {
+			project: frm.doc.name,
+		},
+		callback: function (r) {
+			let items = r.message;
+			let project_items = frm.doc.custom_project_items || [];
+			let updated = false;
+			for (let i = 0; i < project_items.length; i++) {
+				let item = project_items[i];
+				let found = items.find((x) => x.item_code === item.item_code);
+				if (found) {
+					frappe.model.set_value(item.doctype, item.name, "invoiced", found.qty);
+					updated = true;
+				}
+			}
+			if (updated) {
+				frm.refresh_field("custom_project_items");
+			}
+		},
+	});
+}
+
+function calculate_total_amount(frm) {
+	let total_amount = 0;
+	(frm.doc.custom_project_items || []).forEach((item) => {
+		total_amount += item.amount;
+	});
+	frm.set_value("custom_total_company_currency", total_amount);
+}
+
+function calculate_total_quantity(frm) {
+	let total_qty = 0;
+	(frm.doc.custom_project_items || []).forEach((item) => {
+		total_qty += item.qty;
+	});
+	frm.set_value("custom_total_quantity", total_qty);
+}
+
+function calculate_remaining_qty(frm) {
+	// this function will calculate remaining field of each item
+	(frm.doc.custom_project_items || []).forEach((item) => {
+		let remaining = item.qty - item.ordered - item.invoiced;
+		console.log('item', item);
+		frappe.model.set_value(item.doctype, item.name, "remaining", remaining);
 	});
 }
