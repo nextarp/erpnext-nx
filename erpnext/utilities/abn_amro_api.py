@@ -262,12 +262,9 @@ class AbnAmroAPI:
 		else:
 			return None
 
-	def gzip_sct_file_then_base64_encode(self):
-		# Define the path to the XML file
-		xml_file_path = self.sample_sct_file_path
-
+	def gzip_sct_file_then_base64_encode(self, unique_file_path):
 		# Read the XML file
-		with open(xml_file_path, 'rb') as file:
+		with open(unique_file_path, 'rb') as file:
 			xml_data = file.read()
 
 		# Compress the XML data
@@ -278,6 +275,8 @@ class AbnAmroAPI:
 
 		decoded_base64_data = base64_data.decode('utf-8')
 
+		#before returning the data, remove the file
+		os.remove(unique_file_path)
 		# Return the base64 encoded data
 		return decoded_base64_data
 
@@ -302,6 +301,17 @@ class AbnAmroAPI:
 			return None
 
 	def update_sct_file_from_payment_details(self, payment_details):
+		# Generate a UUID for the file name
+		unique_file_name = str(uuid.uuid4()) + '.XML'
+		unique_file_path = os.path.join(os.path.dirname(__file__), unique_file_name)
+
+		# Define the path to the XML file
+		original_file = self.sample_sct_file_path
+
+		# Copy the sample SCT file to a new file with the UUID name
+		with open(sample_sct_file_path, 'rb') as original_file:
+			with open(unique_file_path, 'wb') as new_file:
+				new_file.write(original_file.read())
 		# Get the current datetime
 		current_datetime = datetime.now()
 
@@ -310,14 +320,12 @@ class AbnAmroAPI:
 
 		# Format the date as '2019-05-21'
 		executation_date = current_datetime.strftime('%Y-%m-%d')
-		# Define the path to the XML file
-		xml_file_path = self.sample_sct_file_path
 
 		# Register the default namespace to avoid 'ns0' prefix
 		ET.register_namespace('', 'urn:iso:std:iso:20022:tech:xsd:pain.001.001.03')
 
 		# Parse the XML file
-		tree = ET.parse(xml_file_path)
+		tree = ET.parse(unique_file_path)
 		root = tree.getroot()
 
 		# Define the namespaces to find tags correctly
@@ -346,9 +354,14 @@ class AbnAmroAPI:
 			update_xml_element(root, namespaces, xpath, new_value)
 
 		# Write the modified XML back to the file or use it as needed
-		tree.write(xml_file_path, xml_declaration=True, encoding='utf-8', method="xml")
+		tree.write(unique_file_path, xml_declaration=True, encoding='utf-8', method="xml")
 
-		return
+		if os.path.exists(unique_file_path):
+			return unique_file_path
+		else:
+			# throw an exception that means some security issue or file not found
+			raise FileNotFoundError(f"The file {unique_file_path} does not exist.")
+
 
 
 	def generate_x_request_id(self):

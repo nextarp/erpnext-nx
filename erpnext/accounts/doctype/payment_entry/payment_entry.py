@@ -1663,9 +1663,9 @@ def initiate_payment_from_payment_entry(frappe_doc):
 				"end_to_end_id": end_to_end_id,
 			}
 
-			abn_amro_api.update_sct_file_from_payment_details(payment_details)
+			unique_file_path = abn_amro_api.update_sct_file_from_payment_details(payment_details)
 
-			base64_encoded_sct_data = abn_amro_api.gzip_sct_file_then_base64_encode()
+			base64_encoded_sct_data = abn_amro_api.gzip_sct_file_then_base64_encode(unique_file_path)
 
 			payment_token = abn_amro_api.get_access_payment_token()
 
