@@ -77,6 +77,9 @@ frappe.ui.form.on("Project", {
 
 		get_ordered_items(frm);
 		get_invoiced_items(frm);
+		calculate_total_amount(frm);
+		calculate_total_quantity(frm);
+		calculate_remaining_qty(frm);
 	},
 
 	set_custom_buttons: function (frm) {
@@ -316,5 +319,30 @@ function get_invoiced_items(frm) {
 				frm.refresh_field("custom_project_items");
 			}
 		},
+	});
+}
+
+function calculate_total_amount(frm) {
+	let total_amount = 0;
+	(frm.doc.custom_project_items || []).forEach((item) => {
+		total_amount += item.amount;
+	});
+	frm.set_value("custom_total_company_currency", total_amount);
+}
+
+function calculate_total_quantity(frm) {
+	let total_qty = 0;
+	(frm.doc.custom_project_items || []).forEach((item) => {
+		total_qty += item.qty;
+	});
+	frm.set_value("custom_total_quantity", total_qty);
+}
+
+function calculate_remaining_qty(frm) {
+	// this function will calculate remaining field of each item
+	(frm.doc.custom_project_items || []).forEach((item) => {
+		let remaining = item.qty - item.ordered - item.invoiced;
+		console.log('item', item);
+		frappe.model.set_value(item.doctype, item.name, "remaining", remaining);
 	});
 }
