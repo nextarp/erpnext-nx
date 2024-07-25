@@ -6,10 +6,11 @@ from frappe import _
 from frappe.model.docstatus import DocStatus
 from frappe.model.document import Document
 from frappe.utils import flt
-from erpnext.utilities.abn_amro_api import abn_amro_api
+from erpnext.utilities.abn_amro_api import abn_amro_api, AbnAmroAPI
 import datetime
+import os
 
-from erpnext.utilities.myponto_api import myponto_api
+from erpnext.utilities.myponto_api import MyPontoAPI
 
 
 class BankTransaction(Document):
@@ -264,17 +265,39 @@ def get_latest_transactions():
 	# Get the username of the current user
 	current_user = frappe.session.user
 
-	# Get all Bank Account documents where the current user is the owner
-	bank_accounts = frappe.get_all('Bank Account', filters={'owner': current_user}, fields=['name', 'iban'])
+	# Retrieve bank accounts where specified fields are not None
+	bank_accounts = frappe.get_all(
+		'Bank Account',
+		filters={
+			'custom_api_key': ['is', 'set'],
+			'custom_client_id': ['is', 'set'],
+			'custom_certificate': ['is', 'set'],
+			'custom_private_key': ['is', 'set'],
+			'custom_payment_api_key': ['is', 'set']
+		},
+		fields=['name', 'iban', 'custom_api_key',
+				'custom_client_id', 'custom_certificate',
+				'custom_private_key', 'custom_payment_api_key']
+	)
 
 	# Now, bank_accounts is a list of dictionaries where each dictionary represents a Bank Account document
 	# and contains the name, bank account number, and IBAN of the bank account.
 
-	access_token = abn_amro_api.get_access_token()
-
-	today_date = datetime.datetime.now().strftime('%Y-%m-%d')
 
 	for bank_account in bank_accounts:
+		abn_amro_api = AbnAmroAPI(bank_account['custom_client_id'],
+								  frappe.get_site_path("private", "files", os.path.basename(
+									  bank_account['custom_certificate'])),
+								  frappe.get_site_path("private", "files", os.path.basename(
+									  bank_account['custom_private_key'])),
+								  bank_account['custom_api_key'],
+								  'account:balance:read account:details:read account:transaction:read',
+								  'payment:unsigned:write payment:status:read',
+								  'https://auth-mtls-sandbox.abnamro.com/as/token.oauth2',
+								  bank_account['custom_payment_api_key'])
+
+		access_token = abn_amro_api.get_access_token()
+		today_date = datetime.datetime.now().strftime('%Y-%m-%d')
 		account_number = bank_account['iban']
 		response = abn_amro_api.get_todays_first_set_of_transactions(account_number, access_token, today_date)
 		if not response:
@@ -357,25 +380,38 @@ def create_new_myponto_transaction(account_iban, transaction):
 
 @frappe.whitelist()
 def get_myponto_transactions():
-	# get the bank accounts from myponto accounts function
-	access_token = myponto_api.get_access_token()
-	accounts = myponto_api.get_list_of_accounts(access_token)
-	if not accounts:
-		return "No accounts found"
+	# Retrieve bank accounts where custom_client_id and custom_client_secret are not None
+	bank_accounts = frappe.get_all(
+		'Bank Account',
+		filters={
+			'custom_client_id': ['is', 'set'],
+			'custom_client_secret': ['is', 'set']
+		},
+		fields=['name', 'iban', 'custom_client_id', 'custom_client_secret']
+	)
+	for bank_account in bank_accounts:
+		myponto_api = MyPontoAPI(base_url='https://api.myponto.com',
+								 client_id=bank_account['custom_client_id'],
+								 client_secret=bank_account['custom_client_secret'])
+		# get the bank accounts from myponto accounts function
+		access_token = myponto_api.get_access_token()
+		accounts = myponto_api.get_list_of_accounts(access_token)
+		if not accounts:
+			return "No accounts found"
 
-	account_ibans = []
-	accounts_data = accounts.get('data', None)
-	for accounts in accounts_data:
-		account_attributes = accounts.get('attributes', None)
-		if account_attributes.get('referenceType', None) == 'IBAN':
-			account_ibans.append((account_attributes.get('reference', None), accounts.get('id', None)))
+		account_ibans = []
+		accounts_data = accounts.get('data', None)
+		for accounts in accounts_data:
+			account_attributes = accounts.get('attributes', None)
+			if account_attributes.get('referenceType', None) == 'IBAN':
+				account_ibans.append((account_attributes.get('reference', None), accounts.get('id', None)))
 
-	for account_iban, account_id in account_ibans:
-		transactions = myponto_api.get_list_of_transactions(access_token, account_id)
-		if not transactions:
-			continue
-		for transaction in transactions.get('data', None):
-			create_new_myponto_transaction(account_iban, transaction)
+		for account_iban, account_id in account_ibans:
+			transactions = myponto_api.get_list_of_transactions(access_token, account_id)
+			if not transactions:
+				continue
+			for transaction in transactions.get('data', None):
+				create_new_myponto_transaction(account_iban, transaction)
 
 	return "Operation completed successfully"
 
