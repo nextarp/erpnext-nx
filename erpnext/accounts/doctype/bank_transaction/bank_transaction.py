@@ -7,8 +7,8 @@ from frappe.model.docstatus import DocStatus
 from frappe.model.document import Document
 from frappe.utils import flt
 from erpnext.utilities.abn_amro_api import abn_amro_api, AbnAmroAPI
-import datetime
 import os
+from datetime import timedelta, datetime
 
 from erpnext.utilities.myponto_api import MyPontoAPI
 
@@ -297,9 +297,16 @@ def get_latest_transactions():
 								  bank_account['custom_payment_api_key'])
 
 		access_token = abn_amro_api.get_access_token()
-		today_date = datetime.datetime.now().strftime('%Y-%m-%d')
+		# Get today's date
+		today_date = datetime.now()
+
+		# Subtract 10 days to find the date 10 days before today
+		ten_days_before = today_date - timedelta(days=10)
+
+		# Format the date as 'YYYY-MM-DD'
+		ten_days_before_str = ten_days_before.strftime('%Y-%m-%d')
 		account_number = bank_account['iban']
-		response = abn_amro_api.get_todays_first_set_of_transactions(account_number, access_token, today_date)
+		response = abn_amro_api.get_todays_first_set_of_transactions(account_number, access_token, ten_days_before_str)
 		if not response:
 			continue
 		transaction_list = response['transactions']
@@ -327,7 +334,7 @@ def create_description(transaction_attributes, account_iban):
 	# Check and format executionDate
 	if 'executionDate' in transaction_attributes and transaction_attributes['executionDate'] is not None:
 		# Adjusted to parse the full datetime string including time and timezone
-		user_friendly_date = datetime.datetime.strptime(transaction_attributes['executionDate'],
+		user_friendly_date = datetime.strptime(transaction_attributes['executionDate'],
 														"%Y-%m-%dT%H:%M:%S.%fZ").strftime("%B %d, %Y")
 		description_lines.append(f"executionDate: {user_friendly_date}")
 
@@ -350,7 +357,7 @@ def create_new_myponto_transaction(account_iban, transaction):
 	iso_formatted_date = transaction_attributes['createdAt']
 
 	# Parse the ISO 8601 formatted date
-	parsed_date = datetime.datetime.strptime(iso_formatted_date, "%Y-%m-%dT%H:%M:%S.%fZ")
+	parsed_date = datetime.strptime(iso_formatted_date, "%Y-%m-%dT%H:%M:%S.%fZ")
 
 
 	# Set the fields of the new Bank Transaction document

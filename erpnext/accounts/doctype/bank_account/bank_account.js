@@ -182,6 +182,7 @@ function prepareArgsForBankAccountUpdate(frm, values) {
 
     if (frm.doc.custom_bicswift_code && frm.doc.custom_bicswift_code.startsWith("ABNA")) {
         Object.assign(args, {
+			will_be_updated_api: "abnamro",
             custom_api_key: values.custom_api_key,
             custom_payment_api_key: values.custom_payment_api_key,
             custom_client_id: values.custom_client_id,
@@ -190,10 +191,13 @@ function prepareArgsForBankAccountUpdate(frm, values) {
         });
     } else {
         Object.assign(args, {
+			will_be_updated_api: "myponto",
             custom_client_id: values.custom_client_id,
             custom_client_secret: values.custom_client_secret
         });
     }
+
+	console.log("args", args, values.custom_client_id, values);
 
     return args;
 }
