@@ -17,8 +17,7 @@ def update_xml_element(root, namespaces, xpath, new_value):
 
 class AbnAmroAPI:
 	def __init__(self, client_id, cert_path, key_path,
-				 api_key,scope, payment_scope, api_url,
-				 sample_sct_file_path, payment_api_key):
+				 api_key,scope, payment_scope, api_url, payment_api_key):
 		self.client_id = client_id
 		self.cert_path = cert_path
 		self.key_path = key_path
@@ -383,5 +382,4 @@ abn_amro_api = AbnAmroAPI('test_client',
 						  'PWL3VDT9Y3sXMz1WWjvJTxRBxZgQkSr9',
 						  'account:balance:read account:details:read account:transaction:read',
 						  'payment:unsigned:write payment:status:read',
-						  'https://auth-mtls-sandbox.abnamro.com/as/token.oauth2',
-						  sample_sct_file_path, 'tZSKde7sgfjB0A9GD72cBrLi2dvAoX8D')
+						  'https://auth-mtls-sandbox.abnamro.com/as/token.oauth2', 'tZSKde7sgfjB0A9GD72cBrLi2dvAoX8D')

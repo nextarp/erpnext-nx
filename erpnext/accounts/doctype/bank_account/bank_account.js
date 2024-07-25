@@ -39,43 +39,17 @@ frappe.ui.form.on("Bank Account", {
 							return; // Stop execution
 						}
 
+						let fields = getFieldsBasedOnBicSwiftCode(frm, data);
+
 						// Create and show the dialog
 						let dialog = new frappe.ui.Dialog({
 							title: 'Update API Credentials',
-							fields: [
-								{
-									label: 'API Key',
-									fieldname: 'custom_api_key',
-									fieldtype: 'Data',
-									default: data.custom_api_key
-								},
-								{
-									label: 'Payment API Key',
-									fieldname: 'custom_payment_api_key',
-									fieldtype: 'Data',
-									default: data.custom_payment_api_key
-								},
-								{
-									label: 'Client ID',
-									fieldname: 'custom_client_id',
-									fieldtype: 'Data',
-									default: data.custom_client_id
-								},
-								{
-									label: 'Certificate',
-									fieldname: 'custom_certificate',
-									fieldtype: 'Attach',
-									default: data.custom_certificate,
-								},
-								{
-									label: 'Private Key',
-									fieldname: 'custom_private_key',
-									fieldtype: 'Attach',
-									default: data.custom_private_key
-								}
-							],
+							fields: fields,
 							primary_action_label: 'Update',
 							primary_action(values) {
+								// Initialize the args object with the name property
+								let args = prepareArgsForBankAccountUpdate(frm, values);
+
 								dialog.hide();
 								// Ask for confirmation before sending the backend request
 								frappe.confirm(
@@ -84,14 +58,7 @@ frappe.ui.form.on("Bank Account", {
 										// User confirmed, proceed with the backend request
 										frappe.call({
 											method: "erpnext.accounts.doctype.bank_account.bank_account.update_bank_account_credentials",
-											args: {
-												name: frm.doc.name,
-												custom_api_key: values.custom_api_key,
-												custom_payment_api_key: values.custom_payment_api_key,
-												custom_client_id: values.custom_client_id,
-												custom_certificate: values.custom_certificate,
-												custom_private_key: values.custom_private_key
-											},
+											args: args,
 											callback: function (response) {
 												if (response.message.status === "success") {
 													frappe.msgprint(response.message.message);
@@ -109,16 +76,19 @@ frappe.ui.form.on("Bank Account", {
 								);
 							}
 						});
-						dialog.get_field("custom_certificate").df.options = {
-							restrictions: {
-								allowed_file_types: [".crt"],
-							},
-						};
-						dialog.get_field("custom_private_key").df.options = {
-							restrictions: {
-								allowed_file_types: [".key"],
-							},
-						};
+						if (frm.doc.custom_bicswift_code && frm.doc.custom_bicswift_code.startsWith("ABNA")) {
+							dialog.get_field("custom_certificate").df.options = {
+								restrictions: {
+									allowed_file_types: [".crt"],
+								},
+							};
+							dialog.get_field("custom_private_key").df.options = {
+								restrictions: {
+									allowed_file_types: [".key"],
+								},
+							};
+						}
+
 						dialog.show();
 					}
 				}
@@ -152,3 +122,78 @@ frappe.ui.form.on("Bank Account", {
 		frm.set_df_property("account", "reqd", frm.doc.is_company_account);
 	},
 });
+
+function getFieldsBasedOnBicSwiftCode(frm, data) {
+    if (frm.doc.custom_bicswift_code && frm.doc.custom_bicswift_code.startsWith("ABNA")) {
+        return [
+            {
+                label: 'API Key',
+                fieldname: 'custom_api_key',
+                fieldtype: 'Data',
+                default: data.custom_api_key
+            },
+            {
+                label: 'Payment API Key',
+                fieldname: 'custom_payment_api_key',
+                fieldtype: 'Data',
+                default: data.custom_payment_api_key
+            },
+            {
+                label: 'Client ID',
+                fieldname: 'custom_client_id',
+                fieldtype: 'Data',
+                default: data.custom_client_id
+            },
+            {
+                label: 'Certificate',
+                fieldname: 'custom_certificate',
+                fieldtype: 'Attach',
+                default: data.custom_certificate,
+            },
+            {
+                label: 'Private Key',
+                fieldname: 'custom_private_key',
+                fieldtype: 'Attach',
+                default: data.custom_private_key
+            }
+        ];
+    } else {
+        return [
+            {
+                label: 'Client ID',
+                fieldname: 'custom_client_id',
+                fieldtype: 'Data',
+                default: frm.doc.custom_client_id
+            },
+            {
+                label: 'Client Secret',
+                fieldname: 'custom_client_secret',
+                fieldtype: 'Data',
+				default: frm.doc.custom_client_secret
+            }
+        ];
+    }
+}
+
+function prepareArgsForBankAccountUpdate(frm, values) {
+    let args = {
+        name: frm.doc.name
+    };
+
+    if (frm.doc.custom_bicswift_code && frm.doc.custom_bicswift_code.startsWith("ABNA")) {
+        Object.assign(args, {
+            custom_api_key: values.custom_api_key,
+            custom_payment_api_key: values.custom_payment_api_key,
+            custom_client_id: values.custom_client_id,
+            custom_certificate: values.custom_certificate,
+            custom_private_key: values.custom_private_key
+        });
+    } else {
+        Object.assign(args, {
+            custom_client_id: values.custom_client_id,
+            custom_client_secret: values.custom_client_secret
+        });
+    }
+
+    return args;
+}

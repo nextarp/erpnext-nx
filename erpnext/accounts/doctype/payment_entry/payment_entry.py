@@ -45,8 +45,9 @@ from erpnext.controllers.accounts_controller import (
 	validate_taxes_and_charges,
 )
 from erpnext.setup.utils import get_exchange_rate
-from erpnext.utilities.abn_amro_api import abn_amro_api
+from erpnext.utilities.abn_amro_api import abn_amro_api, AbnAmroAPI
 import uuid
+import os
 
 
 class InvalidPaymentEntry(ValidationError):
@@ -1662,6 +1663,15 @@ def initiate_payment_from_payment_entry(frappe_doc):
 				"payment_information_id": payment_information_id,
 				"end_to_end_id": end_to_end_id,
 			}
+
+			abn_amro_api = AbnAmroAPI(company_bank_account.get("custom_client_id"),
+							 frappe.get_site_path("private", "files", os.path.basename(company_bank_account.get("custom_certificate"))),
+							 frappe.get_site_path("private", "files", os.path.basename(company_bank_account.get("custom_private_key"))),
+						  company_bank_account.get("custom_api_key"),
+						  'account:balance:read account:details:read account:transaction:read',
+						  'payment:unsigned:write payment:status:read',
+						  'https://auth-mtls-sandbox.abnamro.com/as/token.oauth2',
+						    company_bank_account.get("custom_payment_api_key"))
 
 			unique_file_path = abn_amro_api.update_sct_file_from_payment_details(payment_details)
 
