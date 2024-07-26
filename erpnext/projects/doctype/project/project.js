@@ -288,6 +288,8 @@ function get_ordered_items(frm) {
 				if (found) {
 					frappe.model.set_value(item.doctype, item.name, "ordered", found.qty);
 					updated = true;
+				} else {
+					frappe.model.set_value(item.doctype, item.name, "ordered", 0);
 				}
 			}
 			if (updated) {
@@ -342,7 +344,6 @@ function calculate_remaining_qty(frm) {
 	// this function will calculate remaining field of each item
 	(frm.doc.custom_project_items || []).forEach((item) => {
 		let remaining = item.qty - item.ordered - item.invoiced;
-		console.log('item', item);
 		frappe.model.set_value(item.doctype, item.name, "remaining", remaining);
 	});
 }
