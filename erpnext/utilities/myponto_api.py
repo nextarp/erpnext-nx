@@ -24,7 +24,7 @@ class MyPontoAPI:
 		data = {
 			"grant_type": "client_credentials"
 		}
-		response = requests.post(url, headers=headers, data=data, verify=False)
+		response = requests.post(url, headers=headers, data=data)
 		if response.status_code == 200:
 			return response.json()['access_token']
 		else:
@@ -39,7 +39,7 @@ class MyPontoAPI:
 		params = {
 			"limit": 100
 		}
-		response = requests.get(url, headers=headers, params=params, verify=False)
+		response = requests.get(url, headers=headers, params=params)
 		if response.status_code == 200:
 			return response.json()
 		else:
@@ -54,7 +54,7 @@ class MyPontoAPI:
 		params = {
 			"limit": 100
 		}
-		response = requests.get(url, headers=headers, params=params, verify=False)
+		response = requests.get(url, headers=headers, params=params)
 		if response.status_code == 200:
 			return response.json()
 		else:
@@ -66,7 +66,7 @@ class MyPontoAPI:
 			"Accept": "application/json",
 			"Authorization": f"Bearer {access_token}"
 		}
-		response = requests.get(url, headers=headers, verify=False)
+		response = requests.get(url, headers=headers)
 		if response.status_code == 200:
 			return response.json()
 		else:
