@@ -43,7 +43,7 @@ frappe.ui.form.on("Bank Account", {
 
 						// Create and show the dialog
 						let dialog = new frappe.ui.Dialog({
-							title: 'Update API Credentials',
+							title: setTitle(frm),
 							fields: fields,
 							primary_action_label: 'Update',
 							primary_action(values) {
@@ -76,7 +76,7 @@ frappe.ui.form.on("Bank Account", {
 								);
 							}
 						});
-						if (frm.doc.custom_bicswift_code && frm.doc.custom_bicswift_code.startsWith("ABNA")) {
+						if (frm.doc.custom_bicswift_code && frm.doc.custom_bicswift_code.startsWith("ABNANL")) {
 							dialog.get_field("custom_certificate").df.options = {
 								restrictions: {
 									allowed_file_types: [".crt"],
@@ -124,7 +124,7 @@ frappe.ui.form.on("Bank Account", {
 });
 
 function getFieldsBasedOnBicSwiftCode(frm, data) {
-    if (frm.doc.custom_bicswift_code && frm.doc.custom_bicswift_code.startsWith("ABNA")) {
+    if (frm.doc.custom_bicswift_code && frm.doc.custom_bicswift_code.startsWith("ABNANL")) {
         return [
             {
                 label: 'API Key',
@@ -180,7 +180,7 @@ function prepareArgsForBankAccountUpdate(frm, values) {
         name: frm.doc.name
     };
 
-    if (frm.doc.custom_bicswift_code && frm.doc.custom_bicswift_code.startsWith("ABNA")) {
+    if (frm.doc.custom_bicswift_code && frm.doc.custom_bicswift_code.startsWith("ABNANL")) {
         Object.assign(args, {
 			will_be_updated_api: "abnamro",
             custom_api_key: values.custom_api_key,
@@ -200,4 +200,8 @@ function prepareArgsForBankAccountUpdate(frm, values) {
 	console.log("args", args, values.custom_client_id, values);
 
     return args;
+}
+
+function setTitle(frm) {
+	return frm.doc.custom_bicswift_code && frm.doc.custom_bicswift_code.startsWith("ABNANL") ? "Update ABN AMRO API Credentials" : "Update MyPonto API Credentials";
 }
