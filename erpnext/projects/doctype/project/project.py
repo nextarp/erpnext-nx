@@ -331,26 +331,46 @@ class Project(Document):
 			frappe.db.set_value("Project", new_name, "copied_from", new_name)
 
 	def send_welcome_email(self):
-		url = get_url(f"/project/?name={self.name}")
-		messages = (
-			_("You have been invited to collaborate on the project: {0}").format(self.name),
-			url,
-			_("Join"),
-		)
-
-		content = """
-		<p>{0}.</p>
-		<p><a href="{1}">{2}</a></p>
-		"""
-
 		for user in self.users:
 			if user.welcome_email_sent == 0:
+				assigned_role = user.custom_project_role  # Using the custom_role field
+				assignation_date_time = frappe.utils.now_datetime().strftime("%Y-%m-%d %H:%M")  # Current date and time
+				user_name = frappe.get_value("User", user.user, "full_name")  # Get the user's full name
+
+				assignee = frappe.session.user  # The current logged-in user assigning the role
+
+				if assignee == "Administrator":
+					assignee_name = "Administrator"
+				else:
+					assignee_name = frappe.db.get_value("User", {"email": assignee}, ["full_name"])
+
+				url = get_url(f"/projects?project={self.name}")
+				messages = (
+					_("Greetings {0}").format(user_name),
+					_("You have been assigned to Project {0}, as {1}").format(self.name, assigned_role),
+					_("Assignee: {0}").format(assignee_name),
+					_("Date & Time: {0}").format(assignation_date_time),
+					_("You may view the project with the below link:"),
+					url,
+					_("Open Project"),
+				)
+
+				content = """
+				<p>{0}.</p><br>
+				<p>{1}.</p>
+				<p>{2}</p>
+				<p>{3}</p><br>
+				<p>{4}</p>
+				<p><a href="{5}">{6}</a></p>
+				"""
+
 				frappe.sendmail(
 					user.user,
 					subject=_("Project Collaboration Invitation"),
 					content=content.format(*messages),
 				)
 				user.welcome_email_sent = 1
+
 
 
 def get_timeline_data(doctype: str, name: str) -> dict[int, int]:
