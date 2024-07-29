@@ -4,13 +4,14 @@
 frappe.listview_settings["Bank Transaction"] = {
 	onload: function (listview) {
 		listview.page.add_inner_button(__('Get Abn Amro Transactions'), function () {
-				frappe.call({
-					method: 'erpnext.accounts.doctype.bank_transaction.bank_transaction.get_latest_transactions',
-					freeze: true,
-					freeze_message: __("This may take a few seconds..."),
-					callback: function (r) {
-						if (!r.exc) {
+			frappe.call({
+				method: 'erpnext.accounts.doctype.bank_transaction.bank_transaction.get_latest_transactions',
+				freeze: true,
+				freeze_message: __("This may take a few seconds..."),
+				callback: function (r) {
+					if (!r.exc) {
 							frappe.msgprint(r.message);
+							listview.refresh();
 						}
 					}
 				});
@@ -23,6 +24,8 @@ frappe.listview_settings["Bank Transaction"] = {
 					callback: function (r) {
 						if (!r.exc) {
 							frappe.msgprint(r.message);
+							// reload the list view
+							listview.refresh();
 						}
 					}
 				});

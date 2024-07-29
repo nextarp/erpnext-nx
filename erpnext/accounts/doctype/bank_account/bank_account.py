@@ -129,24 +129,19 @@ def make_bank_account(doctype, docname):
 @frappe.whitelist()
 def update_bank_account_credentials(name, custom_api_key=None, custom_client_id=None,
 									custom_certificate=None, custom_private_key=None,
-									custom_payment_api_key=None, custom_client_secret=None):
+									custom_payment_api_key=None, custom_client_secret=None,
+									will_be_updated_api=None):
 	try:
 		doc = frappe.get_doc("Bank Account", name)
-
-		# Update fields only if arguments are provided
-		if custom_api_key is not None:
+		if will_be_updated_api == "abnamro":
 			doc.custom_api_key = custom_api_key
-		if custom_payment_api_key is not None:
 			doc.custom_payment_api_key = custom_payment_api_key
-		if custom_client_id is not None:
 			doc.custom_client_id = custom_client_id
-		if custom_certificate is not None:
 			doc.custom_certificate = custom_certificate
-		if custom_private_key is not None:
 			doc.custom_private_key = custom_private_key
-		# Assuming custom_client_secret is a new field you want to conditionally update
-		if custom_client_secret is not None:
+		else:
 			doc.custom_client_secret = custom_client_secret
+			doc.custom_client_id = custom_client_id
 
 		doc.save()
 		frappe.db.commit()

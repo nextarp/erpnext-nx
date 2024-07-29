@@ -649,3 +649,5 @@ fields_for_group_similar_items = ["qty", "amount"]
 permission_query_conditions = {
     "Project": "erpnext.permission.project_query",
 }
+
+fixtures = ['Custom Field']

@@ -45,7 +45,7 @@ from erpnext.controllers.accounts_controller import (
 	validate_taxes_and_charges,
 )
 from erpnext.setup.utils import get_exchange_rate
-from erpnext.utilities.abn_amro_api import abn_amro_api, AbnAmroAPI
+from erpnext.utilities.abn_amro_api import AbnAmroAPI
 import uuid
 import os
 
