@@ -1,0 +1,112 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2024-07-30 10:34:33.467419",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "creator",
+  "share_with",
+  "assigned_user",
+  "roles",
+  "column_break_acmc",
+  "date",
+  "attachments",
+  "section_break_fwdq",
+  "description"
+ ],
+ "fields": [
+  {
+   "depends_on": "eval:doc.share_with=='Employees'",
+   "fieldname": "assigned_user",
+   "fieldtype": "Table MultiSelect",
+   "label": "Assigned User",
+   "options": "Employee Child Link"
+  },
+  {
+   "default": "Now",
+   "fieldname": "date",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "creator",
+   "fieldtype": "Data",
+   "label": "Creator",
+   "read_only": 1
+  },
+  {
+   "fieldname": "attachments",
+   "fieldtype": "Attach",
+   "label": "Attachments"
+  },
+  {
+   "fieldname": "column_break_acmc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_fwdq",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Text Editor",
+   "label": "Description",
+   "reqd": 1
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Series",
+   "no_copy": 1,
+   "options": "APPREQ-.####",
+   "print_hide": 1,
+   "reqd": 1,
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "share_with",
+   "fieldtype": "Select",
+   "label": "Share with",
+   "options": "All Users\nRole\nEmployees",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.share_with=='Role'",
+   "fieldname": "roles",
+   "fieldtype": "Link",
+   "label": "Roles",
+   "options": "Role"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-07-30 12:47:29.517726",
+ "modified_by": "Administrator",
+ "module": "Projects",
+ "name": "Approval Request",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
