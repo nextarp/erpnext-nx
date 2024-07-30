@@ -21,8 +21,9 @@ class UserApproval(Document):
 		related_user: DF.Link | None
 		request_details: DF.Data | None
 		status: DF.Data | None
+		topic: DF.Data | None
 	# end: auto-generated types
 
-	def on_update(self):
+	def validate(self):
 		if self.approve:
 			self.status = "Approved"
