@@ -15,9 +15,11 @@ class UserApproval(Document):
 		from frappe.types import DF
 
 		approve: DF.Check
+		attachment: DF.Attach | None
+		description: DF.TextEditor | None
 		modified_date: DF.Datetime | None
 		related_user: DF.Link | None
-		request_details: DF.Link | None
+		request_details: DF.Data | None
 		status: DF.Data | None
 	# end: auto-generated types
 	pass

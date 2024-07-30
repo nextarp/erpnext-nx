@@ -11,6 +11,7 @@
   "share_with",
   "assigned_user",
   "roles",
+  "topic",
   "column_break_acmc",
   "date",
   "attachments",
@@ -82,11 +83,18 @@
    "fieldtype": "Link",
    "label": "Roles",
    "options": "Role"
+  },
+  {
+   "fieldname": "topic",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Topic"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-30 12:47:29.517726",
+ "modified": "2024-07-30 14:44:48.588717",
  "modified_by": "Administrator",
  "module": "Projects",
  "name": "Approval Request",
