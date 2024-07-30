@@ -14,3 +14,4 @@ frappe.ui.form.on("User Approval", {
         }
     },
 });
+
