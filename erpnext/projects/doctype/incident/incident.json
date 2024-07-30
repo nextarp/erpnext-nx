@@ -5,6 +5,7 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "details_section",
   "project",
   "employee",
   "date",
@@ -13,9 +14,21 @@
   "status",
   "location_name",
   "street_name",
-  "column_break_rzwr",
-  "attach_image",
-  "image",
+  "section_break_vqhv",
+  "attach_image_1",
+  "image_1",
+  "column_break_blju",
+  "attach_image_2",
+  "image_2",
+  "column_break_mygv",
+  "attach_image_3",
+  "image_3",
+  "column_break_zmfx",
+  "attach_image_4",
+  "image_4",
+  "column_break_mmde",
+  "attach_image_5",
+  "image_5",
   "section_break_adnm",
   "location",
   "column_break_sbyx"
@@ -80,24 +93,10 @@
    "label": "Street Name"
   },
   {
-   "fieldname": "image",
-   "fieldtype": "Image",
-   "label": "Image",
-   "options": "attach_image"
-  },
-  {
-   "fieldname": "column_break_rzwr",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "attach_image",
-   "fieldtype": "Attach Image",
-   "label": "Attach image"
-  },
-  {
    "columns": 1,
    "fieldname": "section_break_adnm",
    "fieldtype": "Section Break",
+   "label": "Location",
    "max_height": "100px",
    "width": "100px"
   },
@@ -111,11 +110,82 @@
    "fieldtype": "Data",
    "label": "Location",
    "reqd": 1
+  },
+  {
+   "fieldname": "section_break_vqhv",
+   "fieldtype": "Section Break",
+   "label": "Images"
+  },
+  {
+   "fieldname": "attach_image_1",
+   "fieldtype": "Attach Image"
+  },
+  {
+   "fieldname": "column_break_blju",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "attach_image_2",
+   "fieldtype": "Attach Image"
+  },
+  {
+   "fieldname": "column_break_mygv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "attach_image_3",
+   "fieldtype": "Attach Image"
+  },
+  {
+   "fieldname": "column_break_zmfx",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "attach_image_4",
+   "fieldtype": "Attach Image"
+  },
+  {
+   "fieldname": "column_break_mmde",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "attach_image_5",
+   "fieldtype": "Attach Image"
+  },
+  {
+   "fieldname": "image_1",
+   "fieldtype": "Image",
+   "options": "attach_image_1"
+  },
+  {
+   "fieldname": "image_2",
+   "fieldtype": "Image",
+   "options": "attach_image_2"
+  },
+  {
+   "fieldname": "image_3",
+   "fieldtype": "Image",
+   "options": "attach_image_3"
+  },
+  {
+   "fieldname": "image_4",
+   "fieldtype": "Image",
+   "options": "attach_image_4"
+  },
+  {
+   "fieldname": "image_5",
+   "fieldtype": "Image",
+   "options": "attach_image_5"
+  },
+  {
+   "fieldname": "details_section",
+   "fieldtype": "Section Break",
+   "label": "Details"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-29 15:10:41.104000",
+ "modified": "2024-07-30 14:02:39.962776",
  "modified_by": "Administrator",
  "module": "Projects",
  "name": "Incident",

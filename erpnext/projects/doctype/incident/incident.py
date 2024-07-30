@@ -8,12 +8,17 @@ from frappe.model.document import Document
 class Incident(Document):
 	# begin: auto-generated types
 	# This code is auto-generated. Do not modify anything in this block.
+
 	from typing import TYPE_CHECKING
 
 	if TYPE_CHECKING:
 		from frappe.types import DF
 
-		attach_image: DF.AttachImage | None
+		attach_image_1: DF.AttachImage | None
+		attach_image_2: DF.AttachImage | None
+		attach_image_3: DF.AttachImage | None
+		attach_image_4: DF.AttachImage | None
+		attach_image_5: DF.AttachImage | None
 		date: DF.Datetime | None
 		employee: DF.Link | None
 		location_name: DF.Data
