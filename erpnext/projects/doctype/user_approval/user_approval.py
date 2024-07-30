@@ -22,4 +22,7 @@ class UserApproval(Document):
 		request_details: DF.Data | None
 		status: DF.Data | None
 	# end: auto-generated types
-	pass
+
+	def on_update(self):
+		if self.approve:
+			self.status = "Approved"
