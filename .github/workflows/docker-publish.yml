@@ -1,6 +1,7 @@
 name: ci
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - version-15-prod
@@ -26,7 +27,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
-          tags: nxmaydogdu/erpnext-nx:test
+          tags: nxmaydogdu/erpnext-nx:latest
           file: ./Containerfile
           build-args: APPS_JSON_BASE64=${{ secrets.APPS_JSON_BASE64 }}
           no-cache: true
