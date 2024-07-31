@@ -28,6 +28,7 @@ class Incident(Document):
 		topic: DF.Data
 	# end: auto-generated types
 
+
 	def before_save(self):
 		employee = frappe.get_value("Employee", {"user_id": frappe.session.user}, "name")
 		if not employee:
