@@ -112,8 +112,8 @@ RUN if [ -n "${APPS_JSON_BASE64}" ]; then \
 
 USER frappe
 
-ARG FRAPPE_BRANCH=version-15
-ARG FRAPPE_PATH=https://github.com/frappe/frappe
+ARG FRAPPE_BRANCH=version-15-prod
+ARG FRAPPE_PATH=https://github.com/nextarp/frappe-nx
 RUN export APP_INSTALL_ARGS="" && \
   if [ -n "${APPS_JSON_BASE64}" ]; then \
     export APP_INSTALL_ARGS="--apps_path=/opt/frappe/apps.json"; \
