@@ -1,11 +1,15 @@
 import frappe
+
+
 def project_query(user):
 	# Get the current user's email
 	user_email = user
 
+	allowed_roles = ["System Manager", "Projectleider"]
+
 	# Check if the user has admin privileges
-	if "System Manager" in frappe.get_roles(user_email):
-		# Return a condition that includes all projects
+	if any(role in allowed_roles for role in frappe.get_roles(user_email)):
+		# Return a condition that includes all users
 		return "1 = 1"
 
 	# Query to get project names from tabProjectUser where email matches the current user's email
@@ -24,3 +28,18 @@ def project_query(user):
 		return f"(`tabProject`.name IN ('{project_names_str}'))"
 	else:
 		return "1 = 0"  # No projects found for the user, return a condition that results in no rows
+
+
+def user_query(user):
+	# Get the current user's email
+	user_email = user
+
+	allowed_roles = ["System Manager", "Projectleider"]
+
+	# Check if the user has admin privileges
+	if any(role in allowed_roles for role in frappe.get_roles(user_email)):
+		# Return a condition that includes all users
+		return "1 = 1"
+
+	# othervise the user only see himself
+	return f"(`tabUser`.email = '{user_email}')"

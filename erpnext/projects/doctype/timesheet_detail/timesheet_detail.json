@@ -48,7 +48,7 @@
    "fieldname": "from_time",
    "fieldtype": "Datetime",
    "in_list_view": 1,
-   "label": "From Time"
+   "label": "Date"
   },
   {
    "fieldname": "section_break_3",
@@ -224,7 +224,7 @@
  "idx": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-02-17 16:53:34.878798",
+ "modified": "2024-07-17 13:20:25.957921",
  "modified_by": "Administrator",
  "module": "Projects",
  "name": "Timesheet Detail",

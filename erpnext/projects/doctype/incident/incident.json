@@ -1,0 +1,211 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-07-29 13:04:20.071350",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "details_section",
+  "project",
+  "employee",
+  "date",
+  "column_break_vpah",
+  "topic",
+  "status",
+  "location_name",
+  "street_name",
+  "section_break_vqhv",
+  "attach_image_1",
+  "image_1",
+  "column_break_blju",
+  "attach_image_2",
+  "image_2",
+  "column_break_mygv",
+  "attach_image_3",
+  "image_3",
+  "column_break_zmfx",
+  "attach_image_4",
+  "image_4",
+  "column_break_mmde",
+  "attach_image_5",
+  "image_5",
+  "section_break_adnm",
+  "location",
+  "column_break_sbyx"
+ ],
+ "fields": [
+  {
+   "default": "Now",
+   "fieldname": "date",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Employee",
+   "options": "Employee",
+   "read_only": 1
+  },
+  {
+   "fieldname": "topic",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Topic",
+   "reqd": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Open\nIn Progress\nDone",
+   "reqd": 1
+  },
+  {
+   "fieldname": "project",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Project",
+   "options": "Project"
+  },
+  {
+   "fieldname": "column_break_vpah",
+   "fieldtype": "Column Break"
+  },
+  {
+   "columns": 2,
+   "fieldname": "location",
+   "fieldtype": "Geolocation",
+   "label": "Map",
+   "max_height": "200px",
+   "width": "200px"
+  },
+  {
+   "fieldname": "street_name",
+   "fieldtype": "Data",
+   "label": "Street Name"
+  },
+  {
+   "columns": 1,
+   "fieldname": "section_break_adnm",
+   "fieldtype": "Section Break",
+   "label": "Location",
+   "max_height": "100px",
+   "width": "100px"
+  },
+  {
+   "fieldname": "column_break_sbyx",
+   "fieldtype": "Column Break",
+   "hidden": 1
+  },
+  {
+   "fieldname": "location_name",
+   "fieldtype": "Data",
+   "label": "Location",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_vqhv",
+   "fieldtype": "Section Break",
+   "label": "Images"
+  },
+  {
+   "fieldname": "attach_image_1",
+   "fieldtype": "Attach Image"
+  },
+  {
+   "fieldname": "column_break_blju",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "attach_image_2",
+   "fieldtype": "Attach Image"
+  },
+  {
+   "fieldname": "column_break_mygv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "attach_image_3",
+   "fieldtype": "Attach Image"
+  },
+  {
+   "fieldname": "column_break_zmfx",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "attach_image_4",
+   "fieldtype": "Attach Image"
+  },
+  {
+   "fieldname": "column_break_mmde",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "attach_image_5",
+   "fieldtype": "Attach Image"
+  },
+  {
+   "fieldname": "image_1",
+   "fieldtype": "Image",
+   "options": "attach_image_1"
+  },
+  {
+   "fieldname": "image_2",
+   "fieldtype": "Image",
+   "options": "attach_image_2"
+  },
+  {
+   "fieldname": "image_3",
+   "fieldtype": "Image",
+   "options": "attach_image_3"
+  },
+  {
+   "fieldname": "image_4",
+   "fieldtype": "Image",
+   "options": "attach_image_4"
+  },
+  {
+   "fieldname": "image_5",
+   "fieldtype": "Image",
+   "options": "attach_image_5"
+  },
+  {
+   "fieldname": "details_section",
+   "fieldtype": "Section Break",
+   "label": "Details"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-07-30 14:02:39.962776",
+ "modified_by": "Administrator",
+ "module": "Projects",
+ "name": "Incident",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "employee"
+}
