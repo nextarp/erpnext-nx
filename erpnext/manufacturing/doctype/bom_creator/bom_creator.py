@@ -156,12 +156,12 @@ class BOMCreator(Document):
 		amount = self.get_raw_material_cost()
 		self.raw_material_cost = amount
 
-	def get_raw_material_cost(self, fg_reference_id=None, amount=0):
-		if not fg_reference_id:
-			fg_reference_id = self.name
+	def get_raw_material_cost(self, fg_item=None, amount=0):
+		if not fg_item:
+			fg_item = self.item_code
 
 		for row in self.items:
-			if row.fg_reference_id != fg_reference_id:
+			if row.fg_item != fg_item:
 				continue
 
 			if not row.is_expandable:
@@ -183,7 +183,7 @@ class BOMCreator(Document):
 
 			else:
 				row.amount = 0.0
-				row.amount = self.get_raw_material_cost(row.name, row.amount)
+				row.amount = self.get_raw_material_cost(row.item_code, row.amount)
 				row.rate = flt(row.amount) / (flt(row.qty) * flt(row.conversion_factor))
 
 			amount += flt(row.amount)
@@ -365,6 +365,12 @@ def get_children(doctype=None, parent=None, **kwargs):
 	return frappe.get_all("BOM Creator Item", fields=fields, filters=query_filters, order_by="idx")
 
 
+def get_parent_row_no(doc, name):
+	for row in doc.items:
+		if row.name == name:
+			return row.idx
+
+
 @frappe.whitelist()
 def add_item(**kwargs):
 	if isinstance(kwargs, str):
@@ -375,6 +381,11 @@ def add_item(**kwargs):
 
 	doc = frappe.get_doc("BOM Creator", kwargs.parent)
 	item_info = get_item_details(kwargs.item_code)
+
+	parent_row_no = ""
+	if kwargs.fg_reference_id and doc.name != kwargs.fg_reference_id:
+		parent_row_no = get_parent_row_no(doc, kwargs.fg_reference_id)
+
 	kwargs.update(
 		{
 			"uom": item_info.stock_uom,
@@ -382,6 +393,9 @@ def add_item(**kwargs):
 			"conversion_factor": 1,
 		}
 	)
+
+	if parent_row_no:
+		kwargs.update({"parent_row_no": parent_row_no})
 
 	doc.append("items", kwargs)
 	doc.save()
