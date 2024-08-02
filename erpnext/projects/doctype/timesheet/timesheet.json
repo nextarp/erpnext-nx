@@ -22,6 +22,7 @@
   "employee",
   "employee_name",
   "department",
+  "week_number",
   "column_break_9",
   "user",
   "start_date",
@@ -304,13 +305,21 @@
    "fieldname": "exchange_rate",
    "fieldtype": "Float",
    "label": "Exchange Rate"
+  },
+  {
+   "fieldname": "week_number",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Week Number",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-clock-o",
  "idx": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-04-20 15:59:11.107831",
+ "modified": "2024-08-02 14:14:13.294067",
  "modified_by": "Administrator",
  "module": "Projects",
  "name": "Timesheet",

@@ -34,6 +34,7 @@ class Timesheet(Document):
 		self.set_dates()
 
 	def before_save(self):
+		self.week_number = get_week_number(self.start_date)
 		# Check if the user is assigned to the project
 		if self.parent_project and not is_user_assigned_to_project(frappe.session.user, self.parent_project):
 			frappe.throw(_("You are not assigned to the project {0}.").format(self.parent_project))
@@ -581,3 +582,10 @@ def get_user_total_working_hours_for_today(user):
 	)
 	total_hours = sum(detail['hours'] for detail in timesheet_details)
 	return total_hours
+
+
+def get_week_number(date):
+	"""
+	Returns the week number of the date
+	"""
+	return date.isocalendar()[1]
