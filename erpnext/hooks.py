@@ -18,6 +18,7 @@ web_include_js = "erpnext-web.bundle.js"
 web_include_css = "erpnext-web.bundle.css"
 email_css = "email_erpnext.bundle.css"
 
+
 doctype_js = {
 	"Address": "public/js/address.js",
 	"Communication": "public/js/communication.js",
