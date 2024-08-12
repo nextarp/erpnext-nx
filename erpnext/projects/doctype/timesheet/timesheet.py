@@ -571,6 +571,7 @@ def is_user_assigned_to_project(user, project):
 	project_users = get_project_users(project)
 	return any(pu['user'] == user for pu in project_users)
 
+
 def get_user_total_working_hours_for_today(user):
 	timesheet_details = frappe.get_all(
 		'Timesheet Detail',
@@ -578,9 +579,15 @@ def get_user_total_working_hours_for_today(user):
 			'owner': user,
 			'from_time': ['>=', nowdate()]
 		},
-		fields=['hours']
+		fields=['hours', 'parent']
 	)
-	total_hours = sum(detail['hours'] for detail in timesheet_details)
+
+	total_hours = 0
+	for detail in timesheet_details:
+		parent_status = frappe.db.get_value('Timesheet', detail['parent'], 'status')
+		if parent_status != 'Cancelled':
+			total_hours += detail['hours']
+
 	return total_hours
 
 
