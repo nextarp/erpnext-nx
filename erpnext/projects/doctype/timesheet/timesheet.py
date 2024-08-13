@@ -37,7 +37,11 @@ class Timesheet(Document):
 		self.week_number = get_week_number(self.start_date)
 		# Check if the user is assigned to the project
 		if self.parent_project and not is_user_assigned_to_project(frappe.session.user, self.parent_project):
-			frappe.throw(_("You are not assigned to the project {0}.").format(self.parent_project))
+			if self.custom_project_plan and not is_user_assigned_to_plan(frappe.session.user, self.custom_project_plan):
+				frappe.throw(_("You are not assigned to the plan {0}.").format(self.custom_project_plan))
+
+			if not self.custom_project_plan:
+				frappe.throw(_("You are not assigned to the project {0}. If you are assigned to a project plan, please make sure to select it").format(self.parent_project))
 
 		# get the user is project leader or not
 		is_project_leader = user_is_project_leader(frappe.session.user, self.parent_project)
@@ -565,11 +569,21 @@ def get_list_context(context=None):
 	}
 
 def get_project_users(project):
-	return frappe.get_all('Project User', filters={'parent': project}, fields=['user'])
+    return frappe.get_all('Project User', filters={'parent': project}, fields=['user'])
+
 
 def is_user_assigned_to_project(user, project):
 	project_users = get_project_users(project)
 	return any(pu['user'] == user for pu in project_users)
+
+def is_user_assigned_to_plan(user, docname):
+    task = frappe.get_doc('Task', docname)
+    assigned_user = frappe.get_all('Plan Assigned Employees', filters={'parent': task.name}, fields=['user'])
+
+
+    return any(au['user'] == user for au in assigned_user)
+
+
 
 def get_user_total_working_hours_for_today(user):
 	timesheet_details = frappe.get_all(
