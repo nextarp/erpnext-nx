@@ -50,7 +50,7 @@ class MaterialRequestItem(Document):
 		received_qty: DF.Float
 		sales_order: DF.Link | None
 		sales_order_item: DF.Data | None
-		schedule_date: DF.Date
+		schedule_date: DF.Date | None
 		stock_qty: DF.Float
 		stock_uom: DF.Link
 		uom: DF.Link
