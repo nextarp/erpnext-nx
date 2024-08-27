@@ -297,7 +297,8 @@ erpnext.buying.PurchaseOrderController = class PurchaseOrderController extends (
 					this.frm.doc.status !== "Closed" &&
 					flt(this.frm.doc.per_received, 2) < 100 &&
 					flt(this.frm.doc.per_billed, 2) < 100
-				) {
+				)
+				/* {
 					if (!this.frm.doc.__onload || this.frm.doc.__onload.can_update_items) {
 						this.frm.add_custom_button(__("Update Items"), () => {
 							erpnext.utils.update_child_items({
@@ -308,7 +309,7 @@ erpnext.buying.PurchaseOrderController = class PurchaseOrderController extends (
 							});
 						});
 					}
-				}
+				} */
 				if (this.frm.has_perm("submit")) {
 					if (flt(doc.per_billed, 2) < 100 || flt(doc.per_received, 2) < 100) {
 						if (doc.status != "On Hold") {
